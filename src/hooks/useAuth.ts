@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -19,13 +20,20 @@ export function useAuth() {
     queryKey: AUTH_QUERY_KEY,
     queryFn: async () => {
       const res = await authApi.me();
-      setUser(res.data);
       return res.data;
     },
     retry: false,
     staleTime: 5 * 60 * 1000,
-    enabled: hydrated && !user,
+    enabled: hydrated,
   });
+
+  useEffect(() => {
+    if (meQuery.isSuccess) {
+      setUser(meQuery.data);
+    } else if (meQuery.isFetched && meQuery.isError) {
+      clear();
+    }
+  }, [meQuery.isSuccess, meQuery.isFetched, meQuery.isError, meQuery.data, setUser, clear]);
 
   const loginMutation = useMutation({
     mutationFn: (input: LoginInput) => authApi.login(input),
@@ -34,7 +42,6 @@ export function useAuth() {
       queryClient.setQueryData(AUTH_QUERY_KEY, res.data.user);
       toast.success("Welcome back!");
       router.replace(ROLE_HOME[res.data.user.role]);
-      router.refresh();
     },
     onError: (error: Error) => {
       toast.error(error.message || "Login failed");
@@ -48,7 +55,6 @@ export function useAuth() {
       queryClient.setQueryData(AUTH_QUERY_KEY, res.data.user);
       toast.success("Account created. Welcome to Assessly!");
       router.replace(ROLE_HOME[res.data.user.role]);
-      router.refresh();
     },
     onError: (error: Error) => {
       toast.error(error.message || "Registration failed");
@@ -59,14 +65,13 @@ export function useAuth() {
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
       clear();
-      queryClient.removeQueries({ queryKey: AUTH_QUERY_KEY });
+      queryClient.setQueryData(AUTH_QUERY_KEY, null); // Explicitly nullify cache
       toast.success("Signed out");
       router.replace("/login");
-      router.refresh();
     },
     onError: () => {
       clear();
-      queryClient.removeQueries({ queryKey: AUTH_QUERY_KEY });
+      queryClient.setQueryData(AUTH_QUERY_KEY, null);
       router.replace("/login");
     },
   });

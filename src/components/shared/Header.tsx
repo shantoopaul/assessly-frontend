@@ -13,7 +13,7 @@ const NAV_LINKS = [
 ];
 
 const Header = () => {
-  const { user, hydrated } = useAuth();
+  const { user, hydrated, isAuthenticated } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
@@ -39,8 +39,8 @@ const Header = () => {
             </Link>
           ))}
 
-          {!hydrated ? null : user ? (
-            <Link href={ROLE_HOME[user.role]}>
+          {!hydrated ? null : isAuthenticated ? (
+            <Link href={ROLE_HOME[user!.role]}>
               <Button>
                 <LayoutDashboard aria-hidden="true" />
                 Dashboard
