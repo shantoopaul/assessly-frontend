@@ -1,6 +1,6 @@
 import DashboardOverview from "@/components/dashboard/dashboard-overview";
 import { ROLES } from "@/constants/roles";
 
-export default function AdminPage() {
-  return <DashboardOverview role={ROLES.ADMIN} />;
+export default function ReviewerPage() {
+  return <DashboardOverview role={ROLES.REVIEWER} />;
 }
