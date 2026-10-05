@@ -1,6 +1,10 @@
-import { ArrowRight } from "lucide-react";
+"use client";
+
+import { LayoutDashboard, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { ROLE_HOME } from "@/constants/routes";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -9,6 +13,8 @@ const NAV_LINKS = [
 ];
 
 const Header = () => {
+  const { user, hydrated } = useAuth();
+
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
       <nav
@@ -27,18 +33,27 @@ const Header = () => {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:block"
             >
               {item.label}
             </Link>
           ))}
 
-          <Link href="/login">
-            <Button>
-              Sign in
-              <ArrowRight aria-hidden="true" />
-            </Button>
-          </Link>
+          {!hydrated ? null : user ? (
+            <Link href={ROLE_HOME[user.role]}>
+              <Button>
+                <LayoutDashboard aria-hidden="true" />
+                Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <Button>
+                Sign in
+                <ArrowRight aria-hidden="true" />
+              </Button>
+            </Link>
+          )}
         </div>
       </nav>
     </header>

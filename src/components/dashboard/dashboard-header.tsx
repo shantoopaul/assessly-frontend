@@ -4,6 +4,7 @@ import { Bell, Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { LogoutButton } from "../auth/logout-button";
 
 type DashboardHeaderProps = {
   role: string;
@@ -38,14 +39,18 @@ export default function DashboardHeader({
         </div>
       </div>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label="Notifications"
-        title="Notifications"
-      >
-        <Bell />
-      </Button>
+      <div className="flex items-center gap-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Notifications"
+          title="Notifications"
+        >
+          <Bell />
+        </Button>
+
+        <LogoutButton className="hidden sm:inline-flex" />
+      </div>
     </header>
   );
 }
