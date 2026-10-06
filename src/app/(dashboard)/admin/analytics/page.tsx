@@ -167,13 +167,13 @@ export default function AdminAnalyticsPage() {
                 />
                 <XAxis
                   dataKey="name"
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="oklch(0.542 0.034 322.5)"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="oklch(0.542 0.034 322.5)"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
@@ -182,14 +182,12 @@ export default function AdminAnalyticsPage() {
                 <Tooltip
                   cursor={{ fill: "rgba(255,255,255,0)" }}
                   contentStyle={{
-                    borderColor: "hsl(var(--border))",
-                    borderRadius: "var(--radius)",
+                    borderColor: "oklch(0.922 0.005 325.62)",
                   }}
                 />
                 <Bar
                   dataKey="value"
-                  fill="hsl(var(--primary))"
-                  radius={[4, 4, 0, 0]}
+                  fill="oklch(0.514 0.222 16.935)"
                   barSize={40}
                 />
               </BarChart>
