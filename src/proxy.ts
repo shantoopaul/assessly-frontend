@@ -12,6 +12,7 @@ type JwtPayload = {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get("accessToken")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
 
   const isProtectedRoute =
     pathname.startsWith("/admin") ||
@@ -22,6 +23,7 @@ export function proxy(request: NextRequest) {
 
   if (isProtectedRoute) {
     if (!accessToken) {
+      if (refreshToken) return NextResponse.next();
       const url = new URL("/login", request.url);
       url.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(url);
@@ -32,6 +34,7 @@ export function proxy(request: NextRequest) {
       const role = payload.role;
 
       if (payload.exp * 1000 < Date.now()) {
+        if (refreshToken) return NextResponse.next();
         const response = NextResponse.redirect(new URL("/login", request.url));
         response.cookies.delete("accessToken");
         response.cookies.delete("refreshToken");
