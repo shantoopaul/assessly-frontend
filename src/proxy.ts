@@ -39,18 +39,24 @@ export function proxy(request: NextRequest) {
       }
 
       if (pathname.startsWith("/admin") && role !== "ADMIN") {
-        return NextResponse.redirect(new URL(`/${role.toLowerCase()}`, request.url));
+        return NextResponse.redirect(
+          new URL(`/${role.toLowerCase()}`, request.url),
+        );
       }
-      
+
       if (pathname.startsWith("/reviewer") && role !== "REVIEWER") {
         if (role === "ADMIN") {
           return NextResponse.redirect(new URL("/admin", request.url));
         }
-        return NextResponse.redirect(new URL(`/${role.toLowerCase()}`, request.url));
+        return NextResponse.redirect(
+          new URL(`/${role.toLowerCase()}`, request.url),
+        );
       }
-      
+
       if (pathname.startsWith("/candidate") && role !== "CANDIDATE") {
-        return NextResponse.redirect(new URL(`/${role.toLowerCase()}`, request.url));
+        return NextResponse.redirect(
+          new URL(`/${role.toLowerCase()}`, request.url),
+        );
       }
     } catch {
       const response = NextResponse.redirect(new URL("/login", request.url));
@@ -65,11 +71,12 @@ export function proxy(request: NextRequest) {
       const payload = jwtDecode<JwtPayload>(accessToken);
       if (payload.exp * 1000 > Date.now()) {
         const role = payload.role;
-        return NextResponse.redirect(new URL(`/${role.toLowerCase()}`, request.url));
+        return NextResponse.redirect(
+          new URL(`/${role.toLowerCase()}`, request.url),
+        );
       }
-    } catch {
-    }
-    
+    } catch {}
+
     const response = NextResponse.next();
     response.cookies.delete("accessToken");
     response.cookies.delete("refreshToken");

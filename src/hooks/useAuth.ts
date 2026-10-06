@@ -33,7 +33,14 @@ export function useAuth() {
     } else if (meQuery.isFetched && meQuery.isError) {
       clear();
     }
-  }, [meQuery.isSuccess, meQuery.isFetched, meQuery.isError, meQuery.data, setUser, clear]);
+  }, [
+    meQuery.isSuccess,
+    meQuery.isFetched,
+    meQuery.isError,
+    meQuery.data,
+    setUser,
+    clear,
+  ]);
 
   const loginMutation = useMutation({
     mutationFn: (input: LoginInput) => authApi.login(input),
@@ -65,7 +72,7 @@ export function useAuth() {
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
       clear();
-      queryClient.setQueryData(AUTH_QUERY_KEY, null); // Explicitly nullify cache
+      queryClient.setQueryData(AUTH_QUERY_KEY, null);
       toast.success("Signed out");
       router.replace("/login");
     },

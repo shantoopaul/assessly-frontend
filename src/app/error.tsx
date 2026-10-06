@@ -12,7 +12,6 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Connect to error monitoring here when configured.
     console.error("Application error:", error);
   }, [error]);
 
