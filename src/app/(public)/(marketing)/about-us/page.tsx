@@ -1,4 +1,12 @@
-import { ArrowRight, ClipboardCheck, Code2, ShieldCheck, Target, Users, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  ClipboardCheck,
+  Code2,
+  ShieldCheck,
+  Target,
+  Users,
+  Zap,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -92,9 +100,9 @@ const AboutUsPage = () => {
 
           <p className="mt-6 text-lg leading-8 text-muted-foreground">
             Assessly brings candidates, reviewers, and administrators into one
-            coordinated platform. Instead of scattered forms and manual
-            scoring, every step — from enrollment to evaluation — is captured,
-            scored, and auditable.
+            coordinated platform. Instead of scattered forms and manual scoring,
+            every step — from enrollment to evaluation — is captured, scored,
+            and auditable.
           </p>
         </div>
       </section>
@@ -107,19 +115,17 @@ const AboutUsPage = () => {
             </h2>
 
             <p className="mt-4 leading-7 text-muted-foreground">
-              Hiring and upskilling decisions deserve more than a take-home
-              PDF. We built Assessly so teams can run developer assessments
-              that are consistent, fair, and easy to audit — while giving
-              candidates a focused, transparent experience from enrollment to
-              results.
+              Hiring and upskilling decisions deserve more than a take-home PDF.
+              We built Assessly so teams can run developer assessments that are
+              consistent, fair, and easy to audit — while giving candidates a
+              focused, transparent experience from enrollment to results.
             </p>
 
             <p className="mt-4 leading-7 text-muted-foreground">
               Every assessment is structured around real difficulty levels,
               timed attempts, and reviewer oversight. Payments are handled
-              through Stripe, and everything that matters is written to an
-              audit log so administrators can see exactly what happened and
-              when.
+              through Stripe, and everything that matters is written to an audit
+              log so administrators can see exactly what happened and when.
             </p>
           </div>
 
@@ -196,10 +202,7 @@ const AboutUsPage = () => {
               const Icon = value.icon;
 
               return (
-                <article
-                  key={value.title}
-                  className="border bg-background p-6"
-                >
+                <article key={value.title} className="border bg-background p-6">
                   <Icon className="size-6 text-primary" aria-hidden="true" />
                   <h3 className="mt-4 font-semibold">{value.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
