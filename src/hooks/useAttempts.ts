@@ -15,16 +15,17 @@ export function useEnrollAssessment() {
 
   return useMutation({
     mutationFn: async (assessmentId: string) => {
-      const res = await apiClient<{ success: true; message: string; data: any }>(
-        `/attempts/enroll/${assessmentId}`,
-        { method: "POST" }
-      );
+      const res = await apiClient<{
+        success: true;
+        message: string;
+        data: any;
+      }>(`/attempts/enroll/${assessmentId}`, { method: "POST" });
       return res;
     },
     onSuccess: (res, assessmentId) => {
       toast.success(res.message);
       queryClient.invalidateQueries({ queryKey: ATTEMPTS_QUERY_KEY });
-      
+
       if (res.data.status === "PENDING_PAYMENT") {
         router.push(`/payment/checkout?attemptId=${res.data.id}`);
       } else {

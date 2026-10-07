@@ -1,6 +1,12 @@
 "use client";
 import { Clock, DollarSign, BookOpen } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAssessments } from "@/hooks/useAssessments";
@@ -29,7 +35,7 @@ export default function CandidateAssessmentsPage() {
         ))}
       </div>
     );
-    }
+  }
 
   if (isError || !data?.success) {
     return (
@@ -62,7 +68,9 @@ export default function CandidateAssessmentsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Available Assessments</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Available Assessments
+        </h1>
         <p className="text-sm text-muted-foreground">
           Browse and enroll in assessments to demonstrate your skills.
         </p>
@@ -73,7 +81,9 @@ export default function CandidateAssessmentsPage() {
           <Card key={assessment.id} className="flex flex-col">
             <CardHeader>
               <div className="flex items-start justify-between">
-                <CardTitle className="line-clamp-2 text-lg">{assessment.title}</CardTitle>
+                <CardTitle className="line-clamp-2 text-lg">
+                  {assessment.title}
+                </CardTitle>
                 <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
                   {assessment.difficulty}
                 </span>
@@ -90,15 +100,15 @@ export default function CandidateAssessmentsPage() {
                 </span>
                 <span className="flex items-center gap-1">
                   <DollarSign className="h-3.5 w-3.5" />
-                  {assessment.feeCents > 0 
-                    ? `$${(assessment.feeCents / 100).toFixed(2)}` 
+                  {assessment.feeCents > 0
+                    ? `$${(assessment.feeCents / 100).toFixed(2)}`
                     : "Free"}
                 </span>
               </div>
             </CardContent>
             <CardFooter>
-              <Button 
-                className="w-full" 
+              <Button
+                className="w-full"
                 onClick={() => enrollMutation.mutate(assessment.id)}
                 disabled={enrollMutation.isPending}
               >

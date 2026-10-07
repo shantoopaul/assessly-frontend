@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { CheckCircle2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function PaymentSuccessPage() {
   return (
@@ -15,7 +21,8 @@ export default function PaymentSuccessPage() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Your assessment enrollment is confirmed. You can now start your attempt from your dashboard.
+            Your assessment enrollment is confirmed. You can now start your
+            attempt from your dashboard.
           </p>
         </CardContent>
         <CardFooter className="flex justify-center">

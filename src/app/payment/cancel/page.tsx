@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { XCircle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function PaymentCancelPage() {
   return (
@@ -15,7 +21,8 @@ export default function PaymentCancelPage() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Your payment was not completed. Your assessment slot is still reserved. You can try again.
+            Your payment was not completed. Your assessment slot is still
+            reserved. You can try again.
           </p>
         </CardContent>
         <CardFooter className="flex justify-center gap-3">

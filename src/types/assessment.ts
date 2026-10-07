@@ -14,25 +14,28 @@ export type Assessment = {
   currency: string;
   status: AssessmentStatus;
   createdAt: string;
-  creator?: {
-    id: string;
-    name: string;
-  };
-  _count?: {
-    questions: number;
-  };
+  creator?: { id: string; name: string };
+  _count?: { questions: number };
+};
+
+export type Question = {
+  id: string;
+  assessmentId: string;
+  prompt: string;
+  type: QuestionType;
+  options?: string[];
+  correctAnswer?: string;
+  points: number;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type AssessmentListResponse = {
   success: true;
   message: string;
   data: Assessment[];
-  meta: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+  meta: { page: number; limit: number; total: number; totalPages: number };
 };
 
 export type AssessmentListQuery = {
@@ -57,3 +60,12 @@ export type CreateAssessmentInput = {
 };
 
 export type UpdateAssessmentInput = Partial<CreateAssessmentInput>;
+
+export type CreateQuestionInput = {
+  prompt: string;
+  type: QuestionType;
+  options?: string[];
+  correctAnswer?: string;
+  points: number;
+  order: number;
+};
