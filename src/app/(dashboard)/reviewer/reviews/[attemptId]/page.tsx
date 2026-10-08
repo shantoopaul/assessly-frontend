@@ -79,14 +79,15 @@ function EvaluationView({
   const evaluateMutation = useEvaluateAttempt();
   const isEvaluated = attempt.status === "EVALUATED" && attempt.review !== null;
 
-  const defaultAnswers: EvaluateFormValues["answers"] = attempt.assessment.questions
-    .filter((question) => question.type !== "MCQ")
-    .flatMap((question) => question.answers)
-    .map((answer) => ({
-      answerId: answer.id,
-      score: answer.reviewerScore ?? 0,
-      feedback: answer.feedback ?? "",
-    }));
+  const defaultAnswers: EvaluateFormValues["answers"] =
+    attempt.assessment.questions
+      .filter((question) => question.type !== "MCQ")
+      .flatMap((question) => question.answers)
+      .map((answer) => ({
+        answerId: answer.id,
+        score: answer.reviewerScore ?? 0,
+        feedback: answer.feedback ?? "",
+      }));
 
   const form = useForm({
     defaultValues: {
@@ -238,7 +239,8 @@ function EvaluationView({
                               : "bg-destructive/10 text-destructive"
                           }`}
                         >
-                          Auto score: {answer.autoScore ?? 0} / {question.points}
+                          Auto score: {answer.autoScore ?? 0} /{" "}
+                          {question.points}
                         </span>
                       </div>
                     ) : answerIndex >= 0 ? (
@@ -325,9 +327,7 @@ function EvaluationView({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     disabled={isEvaluated}
-                    onChange={(event) =>
-                      field.handleChange(event.target.value)
-                    }
+                    onChange={(event) => field.handleChange(event.target.value)}
                     aria-invalid={
                       field.state.meta.isTouched && !field.state.meta.isValid
                     }
@@ -340,9 +340,7 @@ function EvaluationView({
 
         {!isEvaluated && (
           <form.Subscribe
-            selector={(state) =>
-              [state.canSubmit, state.isSubmitting] as const
-            }
+            selector={(state) => [state.canSubmit, state.isSubmitting] as const}
           >
             {([canSubmit, isSubmitting]) => (
               <div className="flex justify-end">
@@ -350,9 +348,7 @@ function EvaluationView({
                   type="submit"
                   size="lg"
                   disabled={
-                    !canSubmit ||
-                    isSubmitting ||
-                    evaluateMutation.isPending
+                    !canSubmit || isSubmitting || evaluateMutation.isPending
                   }
                 >
                   {evaluateMutation.isPending

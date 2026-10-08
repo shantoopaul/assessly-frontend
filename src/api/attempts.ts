@@ -1,5 +1,12 @@
 import apiClient from "@/lib/apiClient";
-import type { AttemptListQuery, AttemptListResponse } from "@/types/attempt";
+import type {
+  AttemptDetail,
+  AttemptListQuery,
+  AttemptListResponse,
+  SaveAnswerResponse,
+  StartAttemptResponse,
+  SubmitAttemptResponse,
+} from "@/types/attempt";
 
 export const attemptsApi = {
   listMine: (query: AttemptListQuery) => {
@@ -13,4 +20,33 @@ export const attemptsApi = {
       { method: "GET" },
     );
   },
+
+  getById: (attemptId: string) =>
+    apiClient<{ success: true; message: string; data: AttemptDetail }>(
+      `/attempts/${attemptId}`,
+      { method: "GET" },
+    ),
+
+  start: (attemptId: string) =>
+    apiClient<StartAttemptResponse>(`/attempts/${attemptId}/start`, {
+      method: "POST",
+    }),
+
+  saveAnswer: (attemptId: string, questionId: string, response: unknown) =>
+    apiClient<SaveAnswerResponse>(
+      `/attempts/${attemptId}/answers/${questionId}`,
+      { method: "PUT", body: { response } },
+    ),
+
+  submit: (attemptId: string) =>
+    apiClient<SubmitAttemptResponse>(`/attempts/${attemptId}/submit`, {
+      method: "POST",
+    }),
+
+  enroll: (assessmentId: string) =>
+    apiClient<{
+      success: true;
+      message: string;
+      data: { id: string; status: string };
+    }>(`/attempts/enroll/${assessmentId}`, { method: "POST" }),
 };

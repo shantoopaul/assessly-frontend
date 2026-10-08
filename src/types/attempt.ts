@@ -52,3 +52,92 @@ export type AttemptListQuery = {
   limit?: number;
   status?: AttemptStatus;
 };
+
+export type AttemptQuestionAnswer = {
+  id: string;
+  response: unknown;
+  autoScore: number | null;
+  reviewerScore: number | null;
+  feedback: string | null;
+};
+
+export type AttemptQuestion = {
+  id: string;
+  prompt: string;
+  type: "MCQ" | "TEXT" | "CODE";
+  options: string[] | null;
+  points: number;
+  order: number;
+  answers: AttemptQuestionAnswer[];
+};
+
+export type AttemptReview = {
+  feedback: string;
+  decision: "PASS" | "FAIL";
+  totalScore: number;
+  createdAt: string;
+};
+
+export type AttemptDetailSummary = {
+  id: string;
+  attemptNo: number;
+  status: AttemptStatus;
+  startedAt: string | null;
+  expiresAt: string | null;
+  submittedAt: string | null;
+  evaluatedAt: string | null;
+  autoScore: number | null;
+  finalScore: number | null;
+  passed: boolean | null;
+  assessment: {
+    id: string;
+    title: string;
+    passingScore: number;
+    durationMinutes?: number;
+    feeCents?: number;
+    currency?: string;
+  };
+  payment: {
+    id: string;
+    status: PaymentStatus;
+    amountCents: number;
+    currency: string;
+  } | null;
+  review: AttemptReview | null;
+};
+
+export type AttemptDetailFull = AttemptDetailSummary & {
+  assessment: AttemptDetailSummary["assessment"] & {
+    questions: AttemptQuestion[];
+  };
+};
+
+export type AttemptDetail = AttemptDetailSummary | AttemptDetailFull;
+
+export type StartAttemptResponse = {
+  success: true;
+  message: string;
+  data: AttemptDetailFull;
+};
+
+export type SaveAnswerResponse = {
+  success: true;
+  message: string;
+  data: {
+    id: string;
+    questionId: string;
+    response: unknown;
+    updatedAt: string;
+  };
+};
+
+export type SubmitAttemptResponse = {
+  success: true;
+  message: string;
+  data: {
+    id: string;
+    status: AttemptStatus;
+    submittedAt: string;
+    autoScore: number;
+  };
+};

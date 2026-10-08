@@ -167,10 +167,26 @@ export default function CandidateAttemptsPage() {
                               Pay Now
                             </Button>
                           </Link>
-                        ) : (
+                        ) : attempt.status === "READY" ? (
+                          <Link href={`/candidate/attempts/${attempt.id}`}>
+                            <Button size="sm">Start</Button>
+                          </Link>
+                        ) : attempt.status === "IN_PROGRESS" ? (
+                          <Link href={`/candidate/attempts/${attempt.id}`}>
+                            <Button size="sm" variant="outline">
+                              Continue
+                            </Button>
+                          </Link>
+                        ) : attempt.status === "CANCELLED" ? (
                           <span className="text-xs text-muted-foreground">
                             —
                           </span>
+                        ) : (
+                          <Link href={`/candidate/attempts/${attempt.id}`}>
+                            <Button size="sm" variant="outline">
+                              View Result
+                            </Button>
+                          </Link>
                         )}
                       </td>
                     </tr>
