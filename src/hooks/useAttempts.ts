@@ -15,6 +15,7 @@ export function useMyAttempts(query: AttemptListQuery) {
     queryKey: [...ATTEMPTS_QUERY_KEY, "my", query],
     queryFn: () => attemptsApi.listMine(query),
     staleTime: 1000 * 30,
+    refetchOnMount: "always",
   });
 }
 
