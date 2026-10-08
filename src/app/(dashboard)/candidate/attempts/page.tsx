@@ -1,6 +1,7 @@
 "use client";
 
-import { ClipboardCheck, Clock, Trophy } from "lucide-react";
+import { ClipboardCheck, Clock, CreditCard, Trophy } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { AttemptFilterForm } from "@/components/candidate/attempt-filter-form";
@@ -105,7 +106,8 @@ export default function CandidateAttemptsPage() {
                     <th className="pb-3">Attempt</th>
                     <th className="pb-3">Status</th>
                     <th className="pb-3">Score</th>
-                    <th className="pb-3 pr-2 text-right">Enrolled</th>
+                    <th className="pb-3">Enrolled</th>
+                    <th className="pb-3 pr-2 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -149,11 +151,27 @@ export default function CandidateAttemptsPage() {
                           </span>
                         )}
                       </td>
-                      <td className="py-3 pr-2 text-right text-xs text-muted-foreground">
+                      <td className="py-3 text-xs text-muted-foreground">
                         <span className="inline-flex items-center gap-1">
                           <Clock className="h-3 w-3" aria-hidden="true" />
                           {new Date(attempt.createdAt).toLocaleDateString()}
                         </span>
+                      </td>
+                      <td className="py-3 pr-2 text-right">
+                        {attempt.status === "PENDING_PAYMENT" ? (
+                          <Link
+                            href={`/payment/checkout?attemptId=${attempt.id}`}
+                          >
+                            <Button size="sm">
+                              <CreditCard className="mr-1 h-3.5 w-3.5" />
+                              Pay Now
+                            </Button>
+                          </Link>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">
+                            —
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ))}

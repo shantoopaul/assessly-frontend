@@ -18,3 +18,21 @@ export type Payment = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type CheckoutSession = {
+  paymentId: string;
+  sessionId: string;
+  checkoutUrl: string;
+};
+
+export type CheckoutSessionResponse = {
+  success: true;
+  message: string;
+  data: CheckoutSession;
+};
+
+export type PaymentResponse = {
+  success: true;
+  message: string;
+  data: Payment;
+};
