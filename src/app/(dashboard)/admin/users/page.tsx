@@ -1,10 +1,30 @@
 "use client";
 
+import { MoreHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+
 import { UserFilterForm } from "@/components/admin/user-filter-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useUsers } from "@/hooks/useUsers";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ROLES, type Role } from "@/constants/roles";
+import {
+  useDeleteUser,
+  useUpdateUserRole,
+  useUpdateUserStatus,
+  useUsers,
+} from "@/hooks/useUsers";
+import { useAuthStore } from "@/store/auth.store";
+import type { User, UserStatus } from "@/types/user";
 import type { UserFilterValues } from "@/validation/users";
 
 export default function AdminUsersPage() {
@@ -58,7 +78,7 @@ export default function AdminUsersPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Manage Users</h1>
           <p className="text-sm text-muted-foreground">
-            View, filter, and manage platform users.
+            View, filter, block, and change roles for platform users.
           </p>
         </div>
       </div>
@@ -85,35 +105,12 @@ export default function AdminUsersPage() {
                     <th className="pb-3">Role</th>
                     <th className="pb-3">Status</th>
                     <th className="pb-3">Joined</th>
+                    <th className="pb-3 pr-2 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {users.map((user) => (
-                    <tr key={user.id} className="border-b last:border-0">
-                      <td className="py-3 pl-2 font-medium">{user.name}</td>
-                      <td className="py-3 text-muted-foreground">
-                        {user.email}
-                      </td>
-                      <td className="py-3">
-                        <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="py-3">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                            user.status === "ACTIVE"
-                              ? "bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400"
-                              : "bg-destructive/10 text-destructive"
-                          }`}
-                        >
-                          {user.status}
-                        </span>
-                      </td>
-                      <td className="py-3 text-muted-foreground">
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
+                    <UserRow key={user.id} user={user} />
                   ))}
                 </tbody>
               </table>
@@ -158,5 +155,113 @@ export default function AdminUsersPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function UserRow({ user }: { user: User }) {
+  const currentUser = useAuthStore((s) => s.user);
+  const isSelf = currentUser?.id === user.id;
+
+  const statusMutation = useUpdateUserStatus();
+  const roleMutation = useUpdateUserRole();
+  const deleteMutation = useDeleteUser();
+
+  const isPending =
+    (statusMutation.isPending && statusMutation.variables?.userId === user.id) ||
+    (roleMutation.isPending && roleMutation.variables?.userId === user.id) ||
+    (deleteMutation.isPending && deleteMutation.variables === user.id);
+
+  const handleToggleStatus = () => {
+    if (isSelf) return;
+    const nextStatus: UserStatus =
+      user.status === "ACTIVE" ? "BLOCKED" : "ACTIVE";
+    statusMutation.mutate({ userId: user.id, status: nextStatus });
+  };
+
+  const handleRoleChange = (role: Role) => {
+    if (isSelf || role === user.role) return;
+    roleMutation.mutate({ userId: user.id, role });
+  };
+
+  const handleDelete = () => {
+    if (isSelf || typeof window === "undefined") return;
+    const confirmed = window.confirm(
+      `Soft delete ${user.name}? Their account will be blocked and sessions revoked.`,
+    );
+    if (!confirmed) return;
+    deleteMutation.mutate(user.id);
+  };
+
+  return (
+    <tr className="border-b last:border-0">
+      <td className="py-3 pl-2 font-medium">
+        {user.name}
+        {isSelf && (
+          <span className="ml-2 text-xs font-normal text-muted-foreground">
+            (you)
+          </span>
+        )}
+      </td>
+      <td className="py-3 text-muted-foreground">{user.email}</td>
+      <td className="py-3">
+        <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+          {user.role}
+        </span>
+      </td>
+      <td className="py-3">
+        <span
+          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+            user.status === "ACTIVE"
+              ? "bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400"
+              : "bg-destructive/10 text-destructive"
+          }`}
+        >
+          {user.status}
+        </span>
+      </td>
+      <td className="py-3 text-muted-foreground">
+        {new Date(user.createdAt).toLocaleDateString()}
+      </td>
+      <td className="py-3 pr-2 text-right">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className="inline-flex size-8 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={`Actions for ${user.name}`}
+            disabled={isPending}
+          >
+            <MoreHorizontal className="size-4" aria-hidden="true" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-48">
+            <DropdownMenuItem disabled={isSelf} onClick={handleToggleStatus}>
+              {user.status === "ACTIVE" ? "Block user" : "Unblock user"}
+            </DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger disabled={isSelf}>
+                Change role
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                {Object.values(ROLES).map((role) => (
+                  <DropdownMenuItem
+                    key={role}
+                    disabled={role === user.role}
+                    onClick={() => handleRoleChange(role)}
+                  >
+                    {role}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              disabled={isSelf}
+              onClick={handleDelete}
+            >
+              Delete user
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </td>
+    </tr>
   );
 }

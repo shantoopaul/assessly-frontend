@@ -1,5 +1,23 @@
 import apiClient from "@/lib/apiClient";
-import type { UserListQuery, UserListResponse } from "@/types/user";
+import type { Role } from "@/constants/roles";
+import type {
+  User,
+  UserListQuery,
+  UserListResponse,
+  UserStatus,
+} from "@/types/user";
+
+type UserMutationResponse = {
+  success: true;
+  message: string;
+  data: Pick<User, "id" | "name" | "email" | "role" | "status">;
+};
+
+type DeleteUserResponse = {
+  success: true;
+  message: string;
+  data: null;
+};
 
 export const usersApi = {
   list: (query: UserListQuery) => {
@@ -13,9 +31,24 @@ export const usersApi = {
 
     return apiClient<UserListResponse>(
       `/admin/users?${searchParams.toString()}`,
-      {
-        method: "GET",
-      },
+      { method: "GET" },
     );
   },
+
+  updateStatus: (userId: string, status: UserStatus) =>
+    apiClient<UserMutationResponse>(`/admin/users/${userId}/status`, {
+      method: "PATCH",
+      body: { status },
+    }),
+
+  updateRole: (userId: string, role: Role) =>
+    apiClient<UserMutationResponse>(`/admin/users/${userId}/role`, {
+      method: "PATCH",
+      body: { role },
+    }),
+
+  softDelete: (userId: string) =>
+    apiClient<DeleteUserResponse>(`/admin/users/${userId}`, {
+      method: "DELETE",
+    }),
 };
