@@ -167,7 +167,8 @@ function UserRow({ user }: { user: User }) {
   const deleteMutation = useDeleteUser();
 
   const isPending =
-    (statusMutation.isPending && statusMutation.variables?.userId === user.id) ||
+    (statusMutation.isPending &&
+      statusMutation.variables?.userId === user.id) ||
     (roleMutation.isPending && roleMutation.variables?.userId === user.id) ||
     (deleteMutation.isPending && deleteMutation.variables === user.id);
 

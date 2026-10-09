@@ -18,13 +18,32 @@ export type Assessment = {
   _count?: { questions: number };
 };
 
+export type ManagedAssessment = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  difficulty: Difficulty;
+  durationMinutes: number;
+  passingScore: number;
+  feeCents: number;
+  currency: string;
+  status: AssessmentStatus;
+  createdById: string;
+  deletedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  questions: Question[];
+  _count: { attempts: number };
+};
+
 export type Question = {
   id: string;
   assessmentId: string;
   prompt: string;
   type: QuestionType;
-  options?: string[];
-  correctAnswer?: string;
+  options: string[] | null;
+  correctAnswer: string | null;
   points: number;
   order: number;
   createdAt: string;
@@ -68,4 +87,10 @@ export type CreateQuestionInput = {
   correctAnswer?: string;
   points: number;
   order: number;
+};
+
+export type ManagedAssessmentResponse = {
+  success: true;
+  message: string;
+  data: ManagedAssessment;
 };

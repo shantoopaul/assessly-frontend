@@ -6,6 +6,7 @@ import type {
   CreateAssessmentInput,
   UpdateAssessmentInput,
   CreateQuestionInput,
+  ManagedAssessmentResponse,
   Question,
 } from "@/types/assessment";
 
@@ -42,6 +43,11 @@ export const assessmentsApi = {
       { method: "GET" },
     );
   },
+
+  getManaged: (id: string) =>
+    apiClient<ManagedAssessmentResponse>(`/assessments/manage/${id}`, {
+      method: "GET",
+    }),
 
   create: (data: CreateAssessmentInput) =>
     apiClient<{ success: true; message: string; data: Assessment }>(

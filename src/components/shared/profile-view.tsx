@@ -36,7 +36,11 @@ const profileSchema = z.object({
 type ProfileValues = z.infer<typeof profileSchema>;
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
-const ACCEPTED_AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+const ACCEPTED_AVATAR_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
 
 type AcceptedAvatarType = (typeof ACCEPTED_AVATAR_TYPES)[number];
 

@@ -16,6 +16,9 @@ export const MANAGED_ASSESSMENTS_QUERY_KEY = [
   "managed",
 ] as const;
 
+const managedDetailKey = (id: string) =>
+  [...MANAGED_ASSESSMENTS_QUERY_KEY, "detail", id] as const;
+
 export function useAssessments(query: AssessmentListQuery) {
   return useQuery({
     queryKey: [...ASSESSMENTS_QUERY_KEY, query],
@@ -28,6 +31,15 @@ export function useManagedAssessments(query: AssessmentListQuery) {
   return useQuery({
     queryKey: [...MANAGED_ASSESSMENTS_QUERY_KEY, query],
     queryFn: () => assessmentsApi.listManaged(query),
+    staleTime: 1000 * 30,
+  });
+}
+
+export function useManagedAssessment(id: string) {
+  return useQuery({
+    queryKey: managedDetailKey(id),
+    queryFn: () => assessmentsApi.getManaged(id),
+    enabled: Boolean(id),
     staleTime: 1000 * 30,
   });
 }
@@ -60,8 +72,9 @@ export function useUpdateAssessment() {
       queryClient.invalidateQueries({
         queryKey: MANAGED_ASSESSMENTS_QUERY_KEY,
       });
+      queryClient.invalidateQueries({ queryKey: ASSESSMENTS_QUERY_KEY });
       queryClient.invalidateQueries({
-        queryKey: [...ASSESSMENTS_QUERY_KEY, variables.id],
+        queryKey: managedDetailKey(variables.id),
       });
     },
     onError: (error: unknown) =>
@@ -75,12 +88,13 @@ export function usePublishAssessment() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => assessmentsApi.publish(id),
-    onSuccess: (res) => {
+    onSuccess: (res, id) => {
       toast.success(res.message);
       queryClient.invalidateQueries({
         queryKey: MANAGED_ASSESSMENTS_QUERY_KEY,
       });
       queryClient.invalidateQueries({ queryKey: ASSESSMENTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: managedDetailKey(id) });
     },
     onError: (error: unknown) =>
       toast.error(
@@ -117,10 +131,14 @@ export function useAddQuestion() {
       assessmentId: string;
       data: CreateQuestionInput;
     }) => assessmentsApi.addQuestion(assessmentId, data),
-    onSuccess: () =>
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: MANAGED_ASSESSMENTS_QUERY_KEY,
-      }),
+      });
+      queryClient.invalidateQueries({
+        queryKey: managedDetailKey(variables.assessmentId),
+      });
+    },
     onError: (error: unknown) =>
       toast.error(
         error instanceof Error ? error.message : "Failed to add question",

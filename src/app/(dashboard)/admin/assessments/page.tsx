@@ -11,10 +11,7 @@ import {
   useManagedAssessments,
   usePublishAssessment,
 } from "@/hooks/useAssessments";
-import type {
-  AssessmentListQuery,
-  AssessmentStatus,
-} from "@/types/assessment";
+import type { AssessmentListQuery, AssessmentStatus } from "@/types/assessment";
 
 const STATUS_STYLES: Record<AssessmentStatus, string> = {
   DRAFT:
