@@ -3,7 +3,7 @@
 import { ProfileSkeleton, ProfileView } from "@/components/shared/profile-view";
 import { useAuth } from "@/hooks/useAuth";
 
-export default function CandidateProfilePage() {
+export default function AdminProfilePage() {
   const { user } = useAuth();
 
   if (!user) return <ProfileSkeleton />;
@@ -11,8 +11,8 @@ export default function CandidateProfilePage() {
   return (
     <ProfileView
       user={user}
-      title="Profile & Settings"
-      description="Manage your personal information and account preferences."
+      title="Administrator Profile"
+      description="Manage your administrator account information and preferences."
     />
   );
 }

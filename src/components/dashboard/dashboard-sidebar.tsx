@@ -107,6 +107,11 @@ const NAVIGATION: Record<Role, NavItem[]> = {
       href: "/admin/analytics",
       icon: ChartNoAxesCombined,
     },
+    {
+      label: "Profile",
+      href: "/admin/profile",
+      icon: Settings,
+    },
   ],
 };
 
