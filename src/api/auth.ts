@@ -5,6 +5,7 @@ import type {
   AuthUser,
   LoginInput,
   RegisterInput,
+  UpdateProfileInput,
 } from "@/types/auth";
 
 export const authApi = {
@@ -27,4 +28,19 @@ export const authApi = {
     }),
 
   me: () => apiClient<ApiEnvelope<AuthUser>>("/users/me"),
+
+  updateMe: (input: UpdateProfileInput) =>
+    apiClient<ApiEnvelope<AuthUser>>("/users/me", {
+      method: "PATCH",
+      body: input,
+    }),
+
+  uploadAvatar: (file: File) => {
+    const formData = new FormData();
+    formData.append("profileImage", file);
+    return apiClient<ApiEnvelope<AuthUser>>("/users/me/avatar", {
+      method: "PATCH",
+      body: formData,
+    });
+  },
 };

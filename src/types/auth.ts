@@ -37,3 +37,7 @@ export type RegisterInput = {
   email: string;
   password: string;
 };
+
+export type UpdateProfileInput = {
+  name: string;
+};
