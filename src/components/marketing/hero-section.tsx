@@ -64,7 +64,6 @@ export function HeroSection() {
           </p>
         </div>
 
-        {/* Right — dashboard mockup */}
         <div className="relative">
           <div className="border bg-card shadow-sm">
             {/* Window chrome */}
@@ -136,7 +135,6 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Floating badge */}
           <div className="absolute -bottom-5 -left-5 hidden items-center gap-2 border bg-background px-4 py-2.5 shadow-sm sm:flex">
             <ShieldCheck className="size-4 text-primary" aria-hidden="true" />
             <span className="text-xs font-semibold">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { HeroSection } from "@/components/marketing/hero-section";
+import { StatsSection } from "@/components/marketing/stats-section";
 
 export const metadata: Metadata = {
   title: "Developer assessments made structured",
@@ -17,6 +18,7 @@ export default function HomePage() {
   return (
     <div>
       <HeroSection />
+      <StatsSection />
     </div>
   );
 }
