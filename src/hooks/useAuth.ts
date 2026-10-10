@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { authApi } from "@/api/auth";
 import { ROLE_HOME } from "@/constants/routes";
 import { useAuthStore } from "@/store/auth.store";
-import type { LoginInput, RegisterInput } from "@/types/auth";
+import type { GoogleLoginInput, LoginInput, RegisterInput } from "@/types/auth";
 
 export const AUTH_QUERY_KEY = ["auth", "me"] as const;
 
@@ -68,6 +68,19 @@ export function useAuth() {
     },
   });
 
+  const googleLoginMutation = useMutation({
+    mutationFn: (input: GoogleLoginInput) => authApi.googleLogin(input),
+    onSuccess: (res) => {
+      setUser(res.data.user);
+      queryClient.setQueryData(AUTH_QUERY_KEY, res.data.user);
+      toast.success(`Signed in as ${res.data.user.name}`);
+      router.replace(ROLE_HOME[res.data.user.role]);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Google sign-in failed");
+    },
+  });
+
   const logoutMutation = useMutation({
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
@@ -93,6 +106,8 @@ export function useAuth() {
     register: registerMutation.mutate,
     registerAsync: registerMutation.mutateAsync,
     isRegistering: registerMutation.isPending,
+    googleLogin: googleLoginMutation.mutate,
+    isGoogleLoggingIn: googleLoginMutation.isPending,
     logout: logoutMutation.mutate,
     isLoggingOut: logoutMutation.isPending,
   };

@@ -3,6 +3,7 @@ import type {
   ApiEnvelope,
   AuthResponse,
   AuthUser,
+  GoogleLoginInput,
   LoginInput,
   RegisterInput,
   UpdateProfileInput,
@@ -17,6 +18,12 @@ export const authApi = {
 
   register: (input: RegisterInput) =>
     apiClient<AuthResponse>("/auth/register", {
+      method: "POST",
+      body: input,
+    }),
+
+  googleLogin: (input: GoogleLoginInput) =>
+    apiClient<AuthResponse>("/auth/google", {
       method: "POST",
       body: input,
     }),

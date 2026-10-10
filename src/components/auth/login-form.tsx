@@ -1,9 +1,11 @@
 "use client";
 
+import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { authApi } from "@/api/auth";
+import { GoogleLoginButton } from "@/components/auth/google-login-button";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -12,7 +14,6 @@ import { ROLE_HOME } from "@/constants/routes";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/auth.store";
 import { loginSchema, type LoginValues } from "@/validation/auth";
-import { useForm } from "@tanstack/react-form";
 
 const DEMO_ACCOUNTS = [
   {
@@ -36,7 +37,7 @@ const DEMO_ACCOUNTS = [
 ] as const;
 
 export function LoginForm() {
-  const { login, isLoggingIn } = useAuth();
+  const { login, isLoggingIn, googleLogin } = useAuth();
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
   const [demoLoading, setDemoLoading] = useState<string | null>(null);
@@ -48,6 +49,13 @@ export function LoginForm() {
       login(value);
     },
   });
+
+  const handleGoogleCredential = useCallback(
+    (credential: string) => {
+      googleLogin({ credential });
+    },
+    [googleLogin],
+  );
 
   const handleDemoLogin = async (account: (typeof DEMO_ACCOUNTS)[number]) => {
     setDemoLoading(account.role);
@@ -150,14 +158,10 @@ export function LoginForm() {
         </form.Subscribe>
       </form>
 
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase tracking-widest">
-          <span className="bg-background px-2 text-muted-foreground">Or</span>
-        </div>
-      </div>
+      <GoogleLoginButton
+        onCredential={handleGoogleCredential}
+        text="signin_with"
+      />
 
       <div className="space-y-3">
         <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
