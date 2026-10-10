@@ -101,9 +101,7 @@ export function HeroSection() {
                 ].map((row) => (
                   <div key={row.label} className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">
-                        {row.label}
-                      </span>
+                      <span className="text-muted-foreground">{row.label}</span>
                       <span className="font-mono font-medium">
                         {row.value}%
                       </span>
