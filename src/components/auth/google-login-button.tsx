@@ -14,6 +14,8 @@ const GOOGLE_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
 const GOOGLE_SCRIPT_ID = "google-identity-services";
 const GOOGLE_BUTTON_WIDTH = 320;
 
+let isGoogleInitialized = false;
+
 type GoogleLoginButtonProps = {
   onCredential: (credential: string) => void;
   text?: GoogleButtonText;
@@ -43,18 +45,23 @@ export function GoogleLoginButton({
 
     if (!clientId || !container || !accountsId) return;
 
-    const config: GoogleIdConfiguration = {
-      client_id: clientId,
-      callback: (response: GoogleCredentialResponse) => {
-        if (response.credential) {
-          credentialHandlerRef.current(response.credential);
-        }
-      },
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    };
+    if (!isGoogleInitialized) {
+      const config: GoogleIdConfiguration = {
+        client_id: clientId,
+        callback: (response: GoogleCredentialResponse) => {
+          if (response.credential) {
+            credentialHandlerRef.current(response.credential);
+          }
+        },
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      };
+      accountsId.initialize(config);
+      isGoogleInitialized = true;
+    }
 
-    accountsId.initialize(config);
+    // Clear the container before rendering to avoid duplicates.
+    container.innerHTML = "";
 
     const options: GoogleButtonOptions = {
       type: "standard",
@@ -76,7 +83,9 @@ export function GoogleLoginButton({
   }, []);
 
   useEffect(() => {
-    if (scriptState === "loaded") renderButton();
+    if (scriptState === "loaded") {
+      renderButton();
+    }
   }, [scriptState, renderButton]);
 
   if (!clientId) return null;
