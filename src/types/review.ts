@@ -113,3 +113,32 @@ export type ReviewListQuery = {
   page?: number;
   limit?: number;
 };
+
+export type MyReviewItem = {
+  id: string;
+  status: ReviewStatus;
+  submittedAt: string | null;
+  evaluatedAt: string | null;
+  finalScore: number | null;
+  passed: boolean | null;
+  assessment: {
+    id: string;
+    title: string;
+  };
+  candidate: {
+    id: string;
+    name: string;
+  };
+};
+
+export type MyReviewsResponse = {
+  success: true;
+  message: string;
+  data: MyReviewItem[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};

@@ -1,6 +1,7 @@
 import apiClient from "@/lib/apiClient";
 import type {
   EvaluateInput,
+  MyReviewsResponse,
   ReviewAttemptResponse,
   ReviewEvaluationResponse,
   ReviewListQuery,
@@ -21,7 +22,7 @@ export const reviewsApi = {
     }),
 
   mine: (query: ReviewListQuery) =>
-    apiClient<ReviewQueueResponse>(`/reviews/mine?${buildQuery(query)}`, {
+    apiClient<MyReviewsResponse>(`/reviews/mine?${buildQuery(query)}`, {
       method: "GET",
     }),
 
