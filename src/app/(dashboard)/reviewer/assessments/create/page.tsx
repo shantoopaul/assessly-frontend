@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
@@ -21,8 +20,8 @@ import {
   usePublishAssessment,
 } from "@/hooks/useAssessments";
 import {
+  CreateAssessmentWizardValues,
   createAssessmentWizardSchema,
-  type CreateAssessmentWizardValues,
 } from "@/validation/assessments";
 
 export default function CreateAssessmentPage() {
@@ -33,7 +32,7 @@ export default function CreateAssessmentPage() {
   const addQuestionMutation = useAddQuestion();
   const publishMutation = usePublishAssessment();
 
-  const form = useForm<CreateAssessmentWizardValues>({
+  const form = useForm({
     defaultValues: {
       title: "",
       slug: "",
@@ -52,7 +51,7 @@ export default function CreateAssessmentPage() {
           points: 10,
         },
       ],
-    },
+    } satisfies CreateAssessmentWizardValues,
     validators: { onChange: createAssessmentWizardSchema },
     onSubmit: async ({ value }) => {
       try {

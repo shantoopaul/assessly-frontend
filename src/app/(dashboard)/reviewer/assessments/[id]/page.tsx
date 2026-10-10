@@ -472,9 +472,7 @@ function QuestionEditor({
 
   const form = useForm({
     defaultValues,
-    validators: {
-      onChange: questionSchema.omit({ order: true } as never) as never,
-    },
+    validators: { onChange: questionSchema },
     onSubmit: async ({ value }) => {
       try {
         if (mode === "create") {

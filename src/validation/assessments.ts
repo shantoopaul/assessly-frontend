@@ -37,40 +37,41 @@ export const questionSchema = z
   .object({
     prompt: z.string().trim().min(3, "Min 3 characters").max(10000),
     type: z.enum(["MCQ", "TEXT", "CODE"]),
-    options: z
-      .array(z.string().min(1, "Option cannot be empty"))
-      .min(2, "Min 2 options")
-      .max(10)
-      .optional(),
-    correctAnswer: z.string().min(1, "Required for MCQ").optional().nullable(),
-    points: z.coerce
-      .number()
-      .int()
-      .min(1, "Min 1 point")
-      .max(100, "Max 100 points"),
+    options: z.array(z.string()).max(10, "Max 10 options"),
+    correctAnswer: z.string(),
+    points: z.number().int().min(1, "Min 1 point").max(100, "Max 100 points"),
   })
   .superRefine((data, ctx) => {
-    if (data.type === "MCQ") {
-      if (!data.options || data.options.length < 2) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["options"],
-          message: "MCQ requires at least 2 options",
-        });
-      }
-      if (!data.correctAnswer) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["correctAnswer"],
-          message: "MCQ requires a correct answer",
-        });
-      } else if (data.options && !data.options.includes(data.correctAnswer)) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["correctAnswer"],
-          message: "Correct answer must match one of the options",
-        });
-      }
+    if (data.type !== "MCQ") return;
+
+    if (data.options.length < 2) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["options"],
+        message: "MCQ requires at least 2 options",
+      });
+    }
+
+    if (data.options.some((opt) => opt.trim().length === 0)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["options"],
+        message: "Options cannot be empty",
+      });
+    }
+
+    if (!data.correctAnswer) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["correctAnswer"],
+        message: "MCQ requires a correct answer",
+      });
+    } else if (!data.options.includes(data.correctAnswer)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["correctAnswer"],
+        message: "Correct answer must match one of the options",
+      });
     }
   });
 
