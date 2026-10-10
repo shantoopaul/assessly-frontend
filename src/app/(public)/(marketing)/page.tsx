@@ -4,6 +4,8 @@ import { StatsSection } from "@/components/marketing/stats-section";
 import { FeaturesSection } from "@/components/marketing/features-section";
 import { HowItWorksSection } from "@/components/marketing/how-it-works-section";
 import { RolesSection } from "@/components/marketing/roles-section";
+import { FaqSection } from "@/components/marketing/faq-section";
+import { CtaSection } from "@/components/marketing/cta-section";
 
 export const metadata: Metadata = {
   title: "Developer assessments made structured",
@@ -25,6 +27,8 @@ export default function HomePage() {
       <FeaturesSection />
       <HowItWorksSection />
       <RolesSection />
+      <FaqSection />
+      <CtaSection />
     </div>
   );
 }
