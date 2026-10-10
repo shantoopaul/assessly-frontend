@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { authApi } from "@/api/auth";
-import { GoogleLoginButton } from "@/components/auth/google-login-button";
+// import { GoogleLoginButton } from "@/components/auth/google-login-button";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -50,12 +50,12 @@ export function LoginForm() {
     },
   });
 
-  const handleGoogleCredential = useCallback(
-    (credential: string) => {
-      googleLogin({ credential });
-    },
-    [googleLogin],
-  );
+  // const handleGoogleCredential = useCallback(
+  //   (credential: string) => {
+  //     googleLogin({ credential });
+  //   },
+  //   [googleLogin],
+  // );
 
   const handleDemoLogin = async (account: (typeof DEMO_ACCOUNTS)[number]) => {
     setDemoLoading(account.role);
@@ -158,10 +158,10 @@ export function LoginForm() {
         </form.Subscribe>
       </form>
 
-      <GoogleLoginButton
+      {/* <GoogleLoginButton
         onCredential={handleGoogleCredential}
         text="signin_with"
-      />
+      /> */}
 
       <div className="space-y-3">
         <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
