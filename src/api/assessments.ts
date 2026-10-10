@@ -8,6 +8,7 @@ import type {
   CreateQuestionInput,
   ManagedAssessmentResponse,
   Question,
+  UpdateQuestionInput,
 } from "@/types/assessment";
 
 export const assessmentsApi = {
@@ -77,5 +78,21 @@ export const assessmentsApi = {
     apiClient<{ success: true; message: string; data: Question }>(
       `/assessments/${assessmentId}/questions`,
       { method: "POST", body: data },
+    ),
+
+  updateQuestion: (
+    assessmentId: string,
+    questionId: string,
+    data: UpdateQuestionInput,
+  ) =>
+    apiClient<{ success: true; message: string; data: Question }>(
+      `/assessments/${assessmentId}/questions/${questionId}`,
+      { method: "PATCH", body: data },
+    ),
+
+  deleteQuestion: (assessmentId: string, questionId: string) =>
+    apiClient<{ success: true; message: string; data: null }>(
+      `/assessments/${assessmentId}/questions/${questionId}`,
+      { method: "DELETE" },
     ),
 };

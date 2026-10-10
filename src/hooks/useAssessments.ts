@@ -8,6 +8,7 @@ import type {
   CreateAssessmentInput,
   UpdateAssessmentInput,
   CreateQuestionInput,
+  UpdateQuestionInput,
 } from "@/types/assessment";
 
 export const ASSESSMENTS_QUERY_KEY = ["assessments"] as const;
@@ -142,6 +143,60 @@ export function useAddQuestion() {
     onError: (error: unknown) =>
       toast.error(
         error instanceof Error ? error.message : "Failed to add question",
+      ),
+  });
+}
+
+export function useUpdateQuestion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      assessmentId,
+      questionId,
+      data,
+    }: {
+      assessmentId: string;
+      questionId: string;
+      data: UpdateQuestionInput;
+    }) => assessmentsApi.updateQuestion(assessmentId, questionId, data),
+    onSuccess: (_data, variables) => {
+      toast.success("Question updated");
+      queryClient.invalidateQueries({
+        queryKey: MANAGED_ASSESSMENTS_QUERY_KEY,
+      });
+      queryClient.invalidateQueries({
+        queryKey: managedDetailKey(variables.assessmentId),
+      });
+    },
+    onError: (error: unknown) =>
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update question",
+      ),
+  });
+}
+
+export function useDeleteQuestion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      assessmentId,
+      questionId,
+    }: {
+      assessmentId: string;
+      questionId: string;
+    }) => assessmentsApi.deleteQuestion(assessmentId, questionId),
+    onSuccess: (_data, variables) => {
+      toast.success("Question deleted");
+      queryClient.invalidateQueries({
+        queryKey: MANAGED_ASSESSMENTS_QUERY_KEY,
+      });
+      queryClient.invalidateQueries({
+        queryKey: managedDetailKey(variables.assessmentId),
+      });
+    },
+    onError: (error: unknown) =>
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete question",
       ),
   });
 }

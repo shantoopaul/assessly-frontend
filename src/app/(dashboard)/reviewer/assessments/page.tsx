@@ -166,7 +166,12 @@ export default function ReviewerAssessmentsPage() {
                         className="border-b last:border-0"
                       >
                         <td className="py-3 pl-2">
-                          <p className="font-medium">{assessment.title}</p>
+                          <Link
+                            href={`/reviewer/assessments/${assessment.id}`}
+                            className="font-medium hover:text-primary hover:underline"
+                          >
+                            {assessment.title}
+                          </Link>
                           <p className="text-xs text-muted-foreground">
                             {assessment.slug}
                           </p>

@@ -94,3 +94,12 @@ export type ManagedAssessmentResponse = {
   message: string;
   data: ManagedAssessment;
 };
+
+export type UpdateQuestionInput = {
+  prompt?: string;
+  type?: QuestionType;
+  options?: string[] | null;
+  correctAnswer?: string | null;
+  points?: number;
+  order?: number;
+};
