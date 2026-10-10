@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/:path(login|register)",
+        source: "/(login|register)", 
         headers: [
           {
             key: "Cross-Origin-Opener-Policy",
@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
-  },
+  }
 };
 
 export default nextConfig;
