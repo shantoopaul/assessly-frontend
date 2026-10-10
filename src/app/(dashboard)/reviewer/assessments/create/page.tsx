@@ -20,7 +20,7 @@ import {
   usePublishAssessment,
 } from "@/hooks/useAssessments";
 import {
-  CreateAssessmentWizardValues,
+  type CreateAssessmentWizardValues,
   createAssessmentWizardSchema,
 } from "@/validation/assessments";
 
@@ -32,26 +32,28 @@ export default function CreateAssessmentPage() {
   const addQuestionMutation = useAddQuestion();
   const publishMutation = usePublishAssessment();
 
+  const INITIAL_VALUES: CreateAssessmentWizardValues = {
+    title: "",
+    slug: "",
+    description: "",
+    difficulty: "MID",
+    durationMinutes: 60,
+    passingScore: 70,
+    feeCents: 0,
+    currency: "usd",
+    questions: [
+      {
+        prompt: "",
+        type: "MCQ",
+        options: ["", ""],
+        correctAnswer: "",
+        points: 10,
+      },
+    ],
+  };
+
   const form = useForm({
-    defaultValues: {
-      title: "",
-      slug: "",
-      description: "",
-      difficulty: "MID",
-      durationMinutes: 60,
-      passingScore: 70,
-      feeCents: 0,
-      currency: "usd",
-      questions: [
-        {
-          prompt: "",
-          type: "MCQ",
-          options: ["", ""],
-          correctAnswer: "",
-          points: 10,
-        },
-      ],
-    } satisfies CreateAssessmentWizardValues,
+    defaultValues: INITIAL_VALUES,
     validators: { onChange: createAssessmentWizardSchema },
     onSubmit: async ({ value }) => {
       try {

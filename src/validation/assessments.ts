@@ -1,36 +1,19 @@
 import { z } from "zod";
 
 export const assessmentDetailsSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(3, "Min 3 characters")
-    .max(150, "Max 150 characters"),
+  title: z.string().trim().min(3, "Min 3 characters").max(150, "Max 150 characters"),
   slug: z
     .string()
     .trim()
     .min(3, "Min 3 characters")
     .max(100, "Max 100 characters")
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Must be lowercase kebab-case"),
-  description: z
-    .string()
-    .trim()
-    .min(20, "Min 20 characters")
-    .max(5000, "Max 5000 characters"),
+  description: z.string().trim().min(20, "Min 20 characters").max(5000, "Max 5000 characters"),
   difficulty: z.enum(["JUNIOR", "MID", "SENIOR"]),
-  durationMinutes: z.coerce
-    .number()
-    .int()
-    .min(5, "Min 5 mins")
-    .max(480, "Max 480 mins"),
-  passingScore: z.coerce.number().min(0, "Min 0%").max(100, "Max 100%"),
-  feeCents: z.coerce.number().int().min(0, "Min 0").max(10000000).default(0),
-  currency: z
-    .string()
-    .trim()
-    .length(3)
-    .transform((v) => v.toLowerCase())
-    .default("usd"),
+  durationMinutes: z.number().int().min(5, "Min 5 mins").max(480, "Max 480 mins"),
+  passingScore: z.number().min(0, "Min 0%").max(100, "Max 100%"),
+  feeCents: z.number().int().min(0, "Min 0").max(10000000),
+  currency: z.string().trim().length(3).transform((v) => v.toLowerCase()),
 });
 
 export const questionSchema = z
