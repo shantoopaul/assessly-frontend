@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { HeroSection } from "@/components/marketing/hero-section";
 import { StatsSection } from "@/components/marketing/stats-section";
+import { FeaturesSection } from "@/components/marketing/features-section";
 
 export const metadata: Metadata = {
   title: "Developer assessments made structured",
@@ -19,6 +20,7 @@ export default function HomePage() {
     <div>
       <HeroSection />
       <StatsSection />
+      <FeaturesSection />
     </div>
   );
 }
