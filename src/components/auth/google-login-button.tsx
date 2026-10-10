@@ -38,35 +38,35 @@ export function GoogleLoginButton({
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   const renderButton = useCallback(() => {
-	const container = containerRef.current;
-	const accountsId = window.google?.accounts?.id;
-  
-	if (!clientId || !container || !accountsId) return;
-  
-	const config: GoogleIdConfiguration = {
-	  client_id: clientId,
-	  callback: (response: GoogleCredentialResponse) => {
-		if (response.credential) {
-		  credentialHandlerRef.current(response.credential);
-		}
-	  },
-	  auto_select: false,
-	  cancel_on_tap_outside: true,
-	};
-  
-	accountsId.initialize(config);
-  
-	const options: GoogleButtonOptions = {
-	  type: "standard",
-	  theme: "outline",
-	  size: "large",
-	  text,
-	  shape: "rectangular",
-	  logo_alignment: "left",
-	  width: GOOGLE_BUTTON_WIDTH,
-	};
-  
-	accountsId.renderButton(container, options);
+    const container = containerRef.current;
+    const accountsId = window.google?.accounts?.id;
+
+    if (!clientId || !container || !accountsId) return;
+
+    const config: GoogleIdConfiguration = {
+      client_id: clientId,
+      callback: (response: GoogleCredentialResponse) => {
+        if (response.credential) {
+          credentialHandlerRef.current(response.credential);
+        }
+      },
+      auto_select: false,
+      cancel_on_tap_outside: true,
+    };
+
+    accountsId.initialize(config);
+
+    const options: GoogleButtonOptions = {
+      type: "standard",
+      theme: "outline",
+      size: "large",
+      text,
+      shape: "rectangular",
+      logo_alignment: "left",
+      width: GOOGLE_BUTTON_WIDTH,
+    };
+
+    accountsId.renderButton(container, options);
   }, [clientId, text]);
 
   useEffect(() => {

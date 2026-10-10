@@ -127,7 +127,9 @@ export function RegisterForm() {
           )}
         </form.Field>
 
-        <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting] as const}>
+        <form.Subscribe
+          selector={(s) => [s.canSubmit, s.isSubmitting] as const}
+        >
           {([canSubmit, isSubmitting]) => (
             <Button
               type="submit"

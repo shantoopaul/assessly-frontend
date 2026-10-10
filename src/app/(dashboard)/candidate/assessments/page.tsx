@@ -16,6 +16,10 @@ export default function CandidateAssessmentsPage() {
   const { data, isLoading, isError } = useAssessments({ page: 1, limit: 10 });
   const enrollMutation = useEnrollAssessment();
 
+  const enrollingId = enrollMutation.isPending
+    ? enrollMutation.variables
+    : null;
+
   if (isLoading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -110,9 +114,9 @@ export default function CandidateAssessmentsPage() {
               <Button
                 className="w-full"
                 onClick={() => enrollMutation.mutate(assessment.id)}
-                disabled={enrollMutation.isPending}
+                disabled={enrollingId === assessment.id}
               >
-                {enrollMutation.isPending ? "Enrolling..." : "Enroll Now"}
+                {enrollingId === assessment.id ? "Enrolling..." : "Enroll Now"}
               </Button>
             </CardFooter>
           </Card>
