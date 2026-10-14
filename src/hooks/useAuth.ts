@@ -28,7 +28,7 @@ export function useAuth() {
   });
 
   useEffect(() => {
-    if (meQuery.isSuccess) {
+    if (meQuery.isSuccess && meQuery.data) {
       setUser(meQuery.data);
     } else if (meQuery.isFetched && meQuery.isError) {
       clear();
@@ -85,13 +85,13 @@ export function useAuth() {
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
       clear();
-      queryClient.setQueryData(AUTH_QUERY_KEY, null);
+      queryClient.removeQueries({ queryKey: AUTH_QUERY_KEY });
       toast.success("Signed out");
       router.replace("/login");
     },
     onError: () => {
       clear();
-      queryClient.setQueryData(AUTH_QUERY_KEY, null);
+      queryClient.removeQueries({ queryKey: AUTH_QUERY_KEY });
       router.replace("/login");
     },
   });

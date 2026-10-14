@@ -4,8 +4,7 @@ import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { authApi } from "@/api/auth";
-// import { GoogleLoginButton } from "@/components/auth/google-login-button";
+import { GoogleLoginButton } from "@/components/auth/google-login-button";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -37,7 +36,7 @@ const DEMO_ACCOUNTS = [
 ] as const;
 
 export function LoginForm() {
-  const { login, isLoggingIn, googleLogin } = useAuth();
+  const { login, loginAsync, isLoggingIn, googleLogin } = useAuth();
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
   const [demoLoading, setDemoLoading] = useState<string | null>(null);
@@ -50,24 +49,17 @@ export function LoginForm() {
     },
   });
 
-  // const handleGoogleCredential = useCallback(
-  //   (credential: string) => {
-  //     googleLogin({ credential });
-  //   },
-  //   [googleLogin],
-  // );
+  const handleGoogleCredential = useCallback(
+    (credential: string) => {
+      googleLogin({ credential });
+    },
+    [googleLogin],
+  );
 
-  const handleDemoLogin = async (account: (typeof DEMO_ACCOUNTS)[number]) => {
-    setDemoLoading(account.role);
-    try {
-      const res = await authApi.login({
-        email: account.email,
-        password: account.password,
-      });
-      setUser(res.data.user);
-      toast.success(`Signed in as ${account.label}`);
-      router.replace(ROLE_HOME[res.data.user.role]);
-      router.refresh();
+const handleDemoLogin = async (account: (typeof DEMO_ACCOUNTS)[number]) => {
+  setDemoLoading(account.role);
+  try {
+    await loginAsync({ email: account.email, password: account.password });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Demo login failed");
     } finally {
@@ -158,10 +150,10 @@ export function LoginForm() {
         </form.Subscribe>
       </form>
 
-      {/* <GoogleLoginButton
+      <GoogleLoginButton
         onCredential={handleGoogleCredential}
         text="signin_with"
-      /> */}
+      />
 
       <div className="space-y-3">
         <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
