@@ -2,14 +2,13 @@
 
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { GoogleLoginButton } from "@/components/auth/google-login-button";
+import GoogleLoginComponent from "@/components/auth/google-login-button";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { ROLES } from "@/constants/roles";
-import { ROLE_HOME } from "@/constants/routes";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/auth.store";
 import { loginSchema, type LoginValues } from "@/validation/auth";
@@ -36,7 +35,7 @@ const DEMO_ACCOUNTS = [
 ] as const;
 
 export function LoginForm() {
-  const { login, loginAsync, isLoggingIn, googleLogin } = useAuth();
+  const { login, loginAsync, isLoggingIn } = useAuth();
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
   const [demoLoading, setDemoLoading] = useState<string | null>(null);
@@ -48,13 +47,6 @@ export function LoginForm() {
       login(value);
     },
   });
-
-  const handleGoogleCredential = useCallback(
-    (credential: string) => {
-      googleLogin({ credential });
-    },
-    [googleLogin],
-  );
 
 const handleDemoLogin = async (account: (typeof DEMO_ACCOUNTS)[number]) => {
   setDemoLoading(account.role);
@@ -150,10 +142,7 @@ const handleDemoLogin = async (account: (typeof DEMO_ACCOUNTS)[number]) => {
         </form.Subscribe>
       </form>
 
-      <GoogleLoginButton
-        onCredential={handleGoogleCredential}
-        text="signin_with"
-      />
+      <GoogleLoginComponent text="signin_with" />
 
       <div className="space-y-3">
         <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">

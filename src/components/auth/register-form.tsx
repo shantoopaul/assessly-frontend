@@ -2,8 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
-import { useCallback } from "react";
-import { GoogleLoginButton } from "@/components/auth/google-login-button";
+import GoogleLoginComponent from "@/components/auth/google-login-button";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -11,7 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { registerSchema, type RegisterValues } from "@/validation/auth";
 
 export function RegisterForm() {
-  const { register, isRegistering, googleLogin } = useAuth();
+  const { register, isRegistering } = useAuth();
 
   const form = useForm({
     defaultValues: {
@@ -24,13 +23,6 @@ export function RegisterForm() {
       register(value);
     },
   });
-
-  const handleGoogleCredential = useCallback(
-    (credential: string) => {
-      googleLogin({ credential });
-    },
-    [googleLogin],
-  );
 
   return (
     <div className="space-y-6">
@@ -145,10 +137,7 @@ export function RegisterForm() {
         </form.Subscribe>
       </form>
 
-      <GoogleLoginButton
-        onCredential={handleGoogleCredential}
-        text="signup_with"
-      />
+      <GoogleLoginComponent text="signin_with" />
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}

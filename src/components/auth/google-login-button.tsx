@@ -1,6 +1,7 @@
 "use client";
 
 import { GoogleLogin } from "@react-oauth/google";
+import { useAuth } from "@/hooks/useAuth";
 
 type GoogleButtonText =
   | "signin_with"
@@ -8,23 +9,27 @@ type GoogleButtonText =
   | "continue_with"
   | "signin";
 
-type GoogleLoginButtonProps = {
-  onCredential: (credential: string) => void;
+type GoogleLoginComponentProps = {
   text?: GoogleButtonText;
-  className?: string;
 };
 
-export function GoogleLoginButton({
-  onCredential,
+export default function GoogleLoginComponent({
   text = "continue_with",
-  className,
-}: GoogleLoginButtonProps) {
+}: GoogleLoginComponentProps) {
+  const { googleLogin } = useAuth();
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   if (!clientId) return null;
 
+  const handleGoogleSuccess = (credentialResponse: { credential?: string }) => {
+    const credential = credentialResponse.credential;
+    if (!credential) return;
+
+    googleLogin({ credential });
+  };
+
   return (
-    <div className={className}>
+    <div>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
@@ -38,20 +43,16 @@ export function GoogleLoginButton({
 
       <div className="mt-4 flex w-full justify-center">
         <GoogleLogin
-          onSuccess={(credentialResponse) => {
-            if (credentialResponse.credential) {
-              onCredential(credentialResponse.credential);
-            }
-          }}
-          onError={() => {
-            console.error("Google sign-in popup was cancelled or failed");
-          }}
-          text={text}
           theme="outline"
+          text={text}
           size="large"
           shape="rectangular"
           logo_alignment="left"
           width="320"
+          onSuccess={handleGoogleSuccess}
+          onError={() => {
+          }}
+
         />
       </div>
     </div>
