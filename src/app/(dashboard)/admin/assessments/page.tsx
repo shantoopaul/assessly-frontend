@@ -1,17 +1,20 @@
 "use client";
-
 import { BookOpen } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AssessmentFilterForm } from "@/components/reviewer/assessment-filter-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   useDeleteAssessment,
   useManagedAssessments,
-  usePublishAssessment,
+  usePublishAssessment
 } from "@/hooks/useAssessments";
 import type { AssessmentListQuery, AssessmentStatus } from "@/types/assessment";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ErrorState } from "@/components/shared/error-state";
+import AdminAssessmentsLoading from "./loading";
+import { PageHeader } from "@/components/shared/page-header";
+import { useConfirm } from "@/components/shared/confirm-dialog-provider";
 
 const STATUS_STYLES: Record<AssessmentStatus, string> = {
   DRAFT:
@@ -24,6 +27,7 @@ const STATUS_STYLES: Record<AssessmentStatus, string> = {
 export default function AdminAssessmentsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const confirm = useConfirm();
 
   const statusParam = searchParams.get("status");
   const statusFilter: AssessmentStatus | undefined =
@@ -40,36 +44,20 @@ export default function AdminAssessmentsPage() {
     status: statusFilter,
   };
 
-  const { data, isLoading, isError } = useManagedAssessments(query);
+  const { data, isLoading, isError, refetch } = useManagedAssessments(query);
   const publishMutation = usePublishAssessment();
   const deleteMutation = useDeleteAssessment();
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-7 w-56" />
-          <Skeleton className="h-4 w-80 max-w-full" />
-        </div>
-        <div className="h-24 w-full animate-pulse bg-muted" />
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-20 w-full animate-pulse bg-muted" />
-          ))}
-        </div>
-      </div>
-    );
+    return <AdminAssessmentsLoading />;
   }
 
   if (isError || !data?.success) {
     return (
-      <Card className="border-destructive/50 bg-destructive/5">
-        <CardContent className="pt-6">
-          <p className="text-sm text-destructive">
-            Failed to load assessments. Please try again later.
-          </p>
-        </CardContent>
-      </Card>
+      <ErrorState
+        message="Failed to load assessments. Please try again later."
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -86,22 +74,25 @@ export default function AdminAssessmentsPage() {
     publishMutation.mutate(id);
   };
 
-  const handleArchive = (id: string) => {
-    if (typeof window === "undefined") return;
-    if (!window.confirm("Soft delete this assessment? It will be archived.")) {
-      return;
-    }
+
+
+  const handleArchive = async (id: string) => {
+    const ok = await confirm({
+      title: "Soft delete this assessment?",
+      description: "It will be archived.",
+      confirmLabel: "Delete",
+      variant: "destructive",
+    });
+    if (!ok) return;
     deleteMutation.mutate(id);
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">All Assessments</h1>
-        <p className="text-sm text-muted-foreground">
-          Oversee every assessment on the platform, from draft to archive.
-        </p>
-      </div>
+      <PageHeader
+        title="All Assessments"
+        description="Oversee every assessment on the platform, from draft to archive."
+      />
 
       <Card>
         <CardHeader>
@@ -111,17 +102,12 @@ export default function AdminAssessmentsPage() {
 
         <CardContent>
           {assessments.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <BookOpen
-                className="mb-4 h-12 w-12 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <h3 className="text-lg font-semibold">No assessments found</h3>
-              <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                No assessments match your current filters. Try clearing the
-                search or status filter.
-              </p>
-            </div>
+            <EmptyState
+              icon={BookOpen}
+              title="No assessments found"
+              description="No assessments match your current filters. Try clearing the
+            search or status filter."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

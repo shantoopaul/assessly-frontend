@@ -1,12 +1,15 @@
 "use client";
 import type { ReactNode } from "react";
-import QueryProvider from "./query.provider";
+import { ConfirmDialogProvider } from "@/components/shared/confirm-dialog-provider";
 import GoogleAuthProvider from "./google-auth.provider";
+import QueryProvider from "./query.provider";
 
 const Providers = ({ children }: { children: ReactNode }) => {
   return (
     <GoogleAuthProvider>
-      <QueryProvider>{children}</QueryProvider>
+      <QueryProvider>
+        <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
+      </QueryProvider>
     </GoogleAuthProvider>
   );
 };

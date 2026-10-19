@@ -1,5 +1,5 @@
 "use client";
-import { Clock, DollarSign, BookOpen } from "lucide-react";
+import { BookOpen, Clock, DollarSign } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -8,12 +8,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAssessments } from "@/hooks/useAssessments";
 import { useEnrollAssessment } from "@/hooks/useAttempts";
+import CandidateAssessmentsLoading from "./loading";
+import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ErrorState } from "@/components/shared/error-state";
 
 export default function CandidateAssessmentsPage() {
-  const { data, isLoading, isError } = useAssessments({ page: 1, limit: 10 });
+  const { data, isLoading, isError, refetch } = useAssessments({
+    page: 1,
+    limit: 10,
+  });
   const enrollMutation = useEnrollAssessment();
 
   const enrollingId = enrollMutation.isPending
@@ -21,35 +27,15 @@ export default function CandidateAssessmentsPage() {
     : null;
 
   if (isLoading) {
-    return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Card key={i}>
-            <CardHeader>
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-full" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-4 w-1/2" />
-            </CardContent>
-            <CardFooter>
-              <Skeleton className="h-10 w-full" />
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    );
+    return <CandidateAssessmentsLoading />;
   }
 
   if (isError || !data?.success) {
     return (
-      <Card className="border-destructive/50 bg-destructive/5">
-        <CardContent className="pt-6">
-          <p className="text-sm text-destructive">
-            Failed to load assessments. Please try again later.
-          </p>
-        </CardContent>
-      </Card>
+      <ErrorState
+        message="Failed to load assessments. Please try again later."
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -58,12 +44,12 @@ export default function CandidateAssessmentsPage() {
   if (assessments.length === 0) {
     return (
       <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-          <BookOpen className="mb-4 h-12 w-12 text-muted-foreground" />
-          <h3 className="text-lg font-semibold">No assessments available</h3>
-          <p className="text-sm text-muted-foreground">
-            Check back later for new developer assessments.
-          </p>
+        <CardContent>
+          <EmptyState
+            icon={BookOpen}
+            title="No assessments available"
+            description="Check back later for new developer assessments."
+          />
         </CardContent>
       </Card>
     );
@@ -71,14 +57,10 @@ export default function CandidateAssessmentsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Available Assessments
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Browse and enroll in assessments to demonstrate your skills.
-        </p>
-      </div>
+      <PageHeader
+        title="Available Assessments"
+        description="Browse and enroll in assessments to demonstrate your skills."
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {assessments.map((assessment) => (

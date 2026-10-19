@@ -81,10 +81,6 @@ export default function CreateAssessmentPage() {
     },
   });
 
-  const isSubmitting =
-    createMutation.isPending ||
-    addQuestionMutation.isPending ||
-    publishMutation.isPending;
   const selectClasses =
     "flex h-10 w-full border border-border bg-transparent px-3 py-2 text-sm focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none";
   const textareaClasses =
@@ -93,7 +89,7 @@ export default function CreateAssessmentPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Create Assessment</h1>
+        <h2 className="text-2xl font-bold tracking-tight">Create Assessment</h2>
         <p className="text-sm text-muted-foreground">
           Step {step} of 2: {step === 1 ? "Details" : "Questions"}
         </p>

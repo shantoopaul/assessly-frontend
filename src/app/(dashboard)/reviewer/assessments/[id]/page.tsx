@@ -1,5 +1,4 @@
 "use client";
-
 import { useForm } from "@tanstack/react-form";
 import {
   ArrowLeft,
@@ -16,12 +15,10 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   useAddQuestion,
   useDeleteAssessment,
@@ -36,6 +33,8 @@ import type {
   QuestionType,
 } from "@/types/assessment";
 import { questionSchema } from "@/validation/assessments";
+import ManagedAssessmentLoading from "./loading";
+import { useConfirm } from "@/components/shared/confirm-dialog-provider";
 
 const STATUS_STYLES: Record<AssessmentStatus, string> = {
   DRAFT:
@@ -79,6 +78,7 @@ export default function ManagedAssessmentPage() {
   const params = useParams<{ id: string }>();
   const assessmentId = params.id;
   const router = useRouter();
+  const confirm = useConfirm();
 
   const { data, isLoading, isError } = useManagedAssessment(assessmentId);
 
@@ -90,13 +90,7 @@ export default function ManagedAssessmentPage() {
   const deleteQuestionMutation = useDeleteQuestion();
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-9 w-72" />
-        <Skeleton className="h-40 w-full" />
-        <Skeleton className="h-64 w-full" />
-      </div>
-    );
+    return <ManagedAssessmentLoading />;
   }
 
   if (isError || !data?.success) {
@@ -142,25 +136,27 @@ export default function ManagedAssessmentPage() {
     publishMutation.mutate(assessmentId);
   };
 
-  const handleDeleteAssessment = () => {
-    if (typeof window === "undefined") return;
-    if (
-      !window.confirm(
-        "Soft delete this assessment? It will be archived and cannot be edited afterwards.",
-      )
-    ) {
-      return;
-    }
+  const handleDeleteAssessment = async () => {
+    const ok = await confirm({
+      title: "Soft delete this assessment?",
+      description: "It will be archived and cannot be edited afterwards.",
+      confirmLabel: "Delete",
+      variant: "destructive",
+    });
+    if (!ok) return;
     deleteAssessmentMutation.mutate(assessmentId, {
       onSuccess: () => router.push("/reviewer/assessments"),
-    });
+    })
   };
 
-  const handleDeleteQuestion = (questionId: string) => {
-    if (typeof window === "undefined") return;
-    if (!window.confirm("Delete this question? This cannot be undone.")) {
-      return;
-    }
+  const handleDeleteQuestion = async (questionId: string) => {
+    const ok = await confirm({
+      title: "Delete this question?",
+      description: "This cannot be undone.",
+      confirmLabel: "Delete",
+      variant: "destructive",
+    });
+    if (!ok) return;
     deleteQuestionMutation.mutate({ assessmentId, questionId });
   };
 
@@ -175,13 +171,12 @@ export default function ManagedAssessmentPage() {
         Back to assessments
       </Button>
 
-      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight">
+            <h2 className="text-2xl font-bold tracking-tight">
               {assessment.title}
-            </h1>
+            </h2>
             <span
               className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${STATUS_STYLES[assessment.status]}`}
             >

@@ -8,6 +8,7 @@ import { authApi } from "@/api/auth";
 import { ROLE_HOME } from "@/constants/routes";
 import { useAuthStore } from "@/store/auth.store";
 import type { GoogleLoginInput, LoginInput, RegisterInput } from "@/types/auth";
+import { toastApiError } from "@/lib/toast";
 
 export const AUTH_QUERY_KEY = ["auth", "me"] as const;
 
@@ -50,9 +51,7 @@ export function useAuth() {
       toast.success("Welcome back!");
       router.replace(ROLE_HOME[res.data.user.role]);
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Login failed");
-    },
+    onError: (error) => toastApiError(error, "Login failed"),
   });
 
   const registerMutation = useMutation({
@@ -63,9 +62,7 @@ export function useAuth() {
       toast.success("Account created. Welcome to Assessly!");
       router.replace(ROLE_HOME[res.data.user.role]);
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Registration failed");
-    },
+    onError: (error) => toastApiError(error, "Registration failed"),
   });
 
   const googleLoginMutation = useMutation({
@@ -76,9 +73,7 @@ export function useAuth() {
       toast.success(`Signed in as ${res.data.user.name}`);
       router.replace(ROLE_HOME[res.data.user.role]);
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Google sign-in failed");
-    },
+    onError: (error) => toastApiError(error, "Google sign-in failed"),
   });
 
   const logoutMutation = useMutation({

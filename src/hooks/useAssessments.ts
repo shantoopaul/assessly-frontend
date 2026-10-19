@@ -10,6 +10,7 @@ import type {
   CreateQuestionInput,
   UpdateQuestionInput,
 } from "@/types/assessment";
+import { toastApiError } from "@/lib/toast";
 
 export const ASSESSMENTS_QUERY_KEY = ["assessments"] as const;
 export const MANAGED_ASSESSMENTS_QUERY_KEY = [
@@ -56,10 +57,7 @@ export function useCreateAssessment() {
       });
       queryClient.invalidateQueries({ queryKey: ASSESSMENTS_QUERY_KEY });
     },
-    onError: (error: unknown) =>
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create assessment",
-      ),
+    onError: (error) => toastApiError(error, "Failed to create assessment"),
   });
 }
 
@@ -78,10 +76,7 @@ export function useUpdateAssessment() {
         queryKey: managedDetailKey(variables.id),
       });
     },
-    onError: (error: unknown) =>
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update assessment",
-      ),
+    onError: (error) => toastApiError(error, "Failed to update assessment"),
   });
 }
 
@@ -97,10 +92,7 @@ export function usePublishAssessment() {
       queryClient.invalidateQueries({ queryKey: ASSESSMENTS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: managedDetailKey(id) });
     },
-    onError: (error: unknown) =>
-      toast.error(
-        error instanceof Error ? error.message : "Failed to publish assessment",
-      ),
+    onError: (error) => toastApiError(error, "Failed to publish assessment"),
   });
 }
 
@@ -115,10 +107,7 @@ export function useDeleteAssessment() {
       });
       queryClient.invalidateQueries({ queryKey: ASSESSMENTS_QUERY_KEY });
     },
-    onError: (error: unknown) =>
-      toast.error(
-        error instanceof Error ? error.message : "Failed to delete assessment",
-      ),
+    onError: (error) => toastApiError(error, "Failed to delete assessment"),
   });
 }
 
@@ -140,10 +129,7 @@ export function useAddQuestion() {
         queryKey: managedDetailKey(variables.assessmentId),
       });
     },
-    onError: (error: unknown) =>
-      toast.error(
-        error instanceof Error ? error.message : "Failed to add question",
-      ),
+    onError: (error) => toastApiError(error, "Failed to add question"),
   });
 }
 
@@ -168,10 +154,7 @@ export function useUpdateQuestion() {
         queryKey: managedDetailKey(variables.assessmentId),
       });
     },
-    onError: (error: unknown) =>
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update question",
-      ),
+    onError: (error) => toastApiError(error, "Failed to update question"),
   });
 }
 
@@ -194,9 +177,6 @@ export function useDeleteQuestion() {
         queryKey: managedDetailKey(variables.assessmentId),
       });
     },
-    onError: (error: unknown) =>
-      toast.error(
-        error instanceof Error ? error.message : "Failed to delete question",
-      ),
+    onError: (error) => toastApiError(error, "Failed to delete question"),
   });
 }

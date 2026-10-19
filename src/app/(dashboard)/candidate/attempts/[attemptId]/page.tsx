@@ -13,7 +13,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useCountdown } from "@/hooks/useCountdown";
 import {
   useAttempt,
@@ -27,6 +26,8 @@ import type {
   AttemptQuestion,
   AttemptStatus,
 } from "@/types/attempt";
+import CandidateAttemptLoading from "./loading";
+import { useConfirm } from "@/components/shared/confirm-dialog-provider";
 
 const textareaClasses =
   "flex min-h-28 w-full border border-border bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none";
@@ -41,6 +42,7 @@ export default function CandidateAttemptPage() {
   const params = useParams<{ attemptId: string }>();
   const attemptId = params.attemptId;
   const router = useRouter();
+  const confirm = useConfirm();
 
   const { data, isLoading, isError } = useAttempt(attemptId);
   const startMutation = useStartAttempt();
@@ -54,13 +56,7 @@ export default function CandidateAttemptPage() {
   const submitMutation = useSubmitAttempt();
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-9 w-64" />
-        <Skeleton className="h-32 w-full" />
-        <Skeleton className="h-64 w-full" />
-      </div>
-    );
+    return <CandidateAttemptLoading />;
   }
 
   if (isError || !detail) {
@@ -143,15 +139,15 @@ export default function CandidateAttemptPage() {
       <AttemptRunner
         attempt={fullAttempt}
         countdown={countdown}
-        onSubmit={() => {
-          if (
-            typeof window !== "undefined" &&
-            window.confirm(
-              "Submit your attempt? You cannot change answers after this.",
-            )
-          ) {
-            submitMutation.mutate(attemptId);
-          }
+        onSubmit={async () => {
+          const ok = await confirm({
+            title: "Submit your attempt?",
+            description: "You cannot change answers after this.",
+            confirmLabel: "Submit",
+            variant: "default",
+          });
+          if (!ok) return;
+          submitMutation.mutate(attemptId);
         }}
         isSubmitting={submitMutation.isPending}
       />
@@ -199,9 +195,9 @@ function AttemptRunner({
     <div className="space-y-6">
       <div className="sticky top-16 z-20 flex flex-col gap-3 border-b bg-background/95 p-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">
+          <h2 className="text-xl font-bold tracking-tight">
             {attempt.assessment.title}
-          </h1>
+          </h2>
           <p className="text-xs text-muted-foreground">
             Attempt #{attempt.attemptNo} · {questions.length} question
             {questions.length === 1 ? "" : "s"}

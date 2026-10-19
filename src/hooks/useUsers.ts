@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { usersApi } from "@/api/users";
 import type { Role } from "@/constants/roles";
 import type { UserListQuery, UserStatus } from "@/types/user";
+import { toastApiError } from "@/lib/toast";
 
 export const USERS_QUERY_KEY = ["users", "list"] as const;
 
@@ -25,9 +26,7 @@ export function useUpdateUserStatus() {
       toast.success(res.message);
       queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to update user status");
-    },
+    onError: (error) => toastApiError(error, "Failed to update user status"),
   });
 }
 
@@ -40,9 +39,7 @@ export function useUpdateUserRole() {
       toast.success(res.message);
       queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to update user role");
-    },
+    onError: (error) => toastApiError(error, "Failed to update user role"),
   });
 }
 
@@ -54,8 +51,6 @@ export function useDeleteUser() {
       toast.success(res.message);
       queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete user");
-    },
+    onError: (error) => toastApiError(error, "Failed to delete user"),
   });
 }

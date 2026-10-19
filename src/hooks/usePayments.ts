@@ -1,8 +1,7 @@
 "use client";
-
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { paymentsApi } from "@/api/payments";
+import { toastApiError } from "@/lib/toast";
 
 export const PAYMENTS_QUERY_KEY = ["payments"] as const;
 
@@ -19,8 +18,6 @@ export function useCreateCheckoutSession() {
   return useMutation({
     mutationFn: (attemptId: string) =>
       paymentsApi.createCheckoutSession(attemptId),
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to start checkout");
-    },
+    onError: (error) => toastApiError(error, "Failed to start checkout"),
   });
 }

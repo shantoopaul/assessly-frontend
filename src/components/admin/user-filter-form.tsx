@@ -6,26 +6,28 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { ROLES } from "@/constants/roles";
-import { userFilterSchema, type UserFilterValues } from "@/validation/users";
+import { userFilterFormSchema, type UserFilterValues } from "@/validation/users";
 
 export function UserFilterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const defaultValues: UserFilterValues = {
+    search: searchParams.get("search") ?? undefined,
+    role:
+      (searchParams.get("role") as UserFilterValues["role"] | null) ??
+      undefined,
+    status:
+      (searchParams.get("status") as UserFilterValues["status"] | null) ??
+      undefined,
+    page: Number(searchParams.get("page")) || 1,
+    limit: Number(searchParams.get("limit")) || 10,
+    sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
+  };
+
   const form = useForm({
-    defaultValues: {
-      search: searchParams.get("search") ?? undefined,
-      role: (searchParams.get("role") as UserFilterValues["role"]) ?? undefined,
-      status:
-        (searchParams.get("status") as UserFilterValues["status"]) ?? undefined,
-      page: Number(searchParams.get("page")) || 1,
-      limit: Number(searchParams.get("limit")) || 10,
-      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
-    } satisfies UserFilterValues,
-    validators: {
-      // @ts-expect-error
-      onChange: userFilterSchema,
-    },
+    defaultValues,
+    validators: { onChange: userFilterFormSchema },
     onSubmit: async ({ value }) => {
       const params = new URLSearchParams();
       if (value.search) params.set("search", value.search);

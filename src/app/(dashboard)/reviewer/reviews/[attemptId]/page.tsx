@@ -15,6 +15,7 @@ import {
   evaluateFormSchema,
   type EvaluateFormValues,
 } from "@/validation/reviews";
+import ReviewAttemptLoading from "./loading";
 
 const textareaClasses =
   "flex min-h-24 w-full border border-border bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20";
@@ -33,13 +34,7 @@ export default function ReviewAttemptPage() {
   const { data, isLoading, isError } = useReviewAttempt(attemptId);
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-9 w-64" />
-        <Skeleton className="h-40 w-full" />
-        <Skeleton className="h-64 w-full" />
-      </div>
-    );
+    return <ReviewAttemptLoading />
   }
 
   if (isError || !data?.success) {

@@ -29,7 +29,7 @@ const CONTACT_CHANNELS = [
     icon: GitFork,
     label: "Source",
     value: "github.com/assessly",
-    href: "https://github.com/",
+    href: "https://github.com/shantoopaul/assessly-frontend",
     description: "Report bugs, request features, or browse the code.",
   },
   {

@@ -1,13 +1,10 @@
 "use client";
-
 import { ClipboardCheck, Clock, CreditCard, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import { AttemptFilterForm } from "@/components/candidate/attempt-filter-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useMyAttempts } from "@/hooks/useAttempts";
 import {
   ATTEMPT_STATUS_LABELS,
@@ -15,6 +12,10 @@ import {
   isAttemptStatus,
 } from "@/lib/attempts";
 import type { AttemptListQuery } from "@/types/attempt";
+import CandidateAttemptsLoading from "./loading";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ErrorState } from "@/components/shared/error-state";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default function CandidateAttemptsPage() {
   const router = useRouter();
@@ -29,34 +30,18 @@ export default function CandidateAttemptsPage() {
     status: statusFilter,
   };
 
-  const { data, isLoading, isError } = useMyAttempts(query);
+  const { data, isLoading, isError, refetch } = useMyAttempts(query);
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-7 w-56" />
-          <Skeleton className="h-4 w-72" />
-        </div>
-        <div className="h-24 w-full animate-pulse bg-muted" />
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 w-full animate-pulse bg-muted" />
-          ))}
-        </div>
-      </div>
-    );
+    return <CandidateAttemptsLoading />;
   }
 
   if (isError || !data?.success) {
     return (
-      <Card className="border-destructive/50 bg-destructive/5">
-        <CardContent className="pt-6">
-          <p className="text-sm text-destructive">
-            Failed to load your attempts. Please try again later.
-          </p>
-        </CardContent>
-      </Card>
+      <ErrorState
+        message="Failed to load your attempts. Please try again later."
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -71,12 +56,10 @@ export default function CandidateAttemptsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">My Attempts</h1>
-        <p className="text-sm text-muted-foreground">
-          Track the status of every assessment you have enrolled in.
-        </p>
-      </div>
+      <PageHeader
+        title="My Attempts"
+        description="Track the status of every assessment you have enrolled in."
+      />
 
       <Card>
         <CardHeader>
@@ -86,17 +69,12 @@ export default function CandidateAttemptsPage() {
 
         <CardContent>
           {attempts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <ClipboardCheck
-                className="mb-4 h-12 w-12 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <h3 className="text-lg font-semibold">No attempts found</h3>
-              <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                You have not enrolled in any assessments yet, or none match your
-                current filter.
-              </p>
-            </div>
+            <EmptyState
+              icon={ClipboardCheck}
+              title="No attempts found"
+              description="You have not enrolled in any assessments yet, or none match your
+            current filter."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

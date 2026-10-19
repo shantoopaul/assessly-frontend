@@ -1,5 +1,4 @@
 "use client";
-
 import {
   BookOpen,
   CheckCircle2,
@@ -20,14 +19,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useManagedAssessments } from "@/hooks/useAssessments";
 import { useMyReviews } from "@/hooks/useReviews";
 import type { Assessment } from "@/types/assessment";
 import type { MyReviewItem } from "@/types/review";
+import ReviewerAnalyticsLoading from "./loading";
+import { ErrorState } from "@/components/shared/error-state";
 
 const CHART_BAR_FILL = "oklch(0.514 0.222 16.935)";
 const CHART_AXIS_STROKE = "oklch(0.542 0.034 322.5)";
@@ -222,34 +221,12 @@ export default function ReviewerAnalyticsPage() {
   }, [assessmentsQuery.data, reviewsQuery.data]);
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-7 w-56" />
-          <Skeleton className="h-4 w-80 max-w-full" />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} className="h-32 w-full" />
-          ))}
-        </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Skeleton className="h-80 w-full" />
-          <Skeleton className="h-80 w-full" />
-        </div>
-      </div>
-    );
+    return <ReviewerAnalyticsLoading />;
   }
 
   if (isError) {
     return (
-      <Card className="border-destructive/50 bg-destructive/5">
-        <CardContent className="pt-6">
-          <p className="text-sm text-destructive">
-            Failed to load analytics data. Please try again later.
-          </p>
-        </CardContent>
-      </Card>
+      <ErrorState message="Failed to load analytics data. Please try again later." />
     );
   }
 

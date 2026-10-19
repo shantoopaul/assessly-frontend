@@ -58,10 +58,6 @@ export function HeroSection() {
               </Button>
             </Link>
           </div>
-
-          <p className="mt-6 text-xs text-muted-foreground">
-            No credit card required · Free assessments supported
-          </p>
         </div>
 
         <div className="relative">

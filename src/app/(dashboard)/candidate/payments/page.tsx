@@ -1,12 +1,9 @@
 "use client";
-
 import { CreditCard, Receipt } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useMyAttempts } from "@/hooks/useAttempts";
 import {
   formatMoney,
@@ -14,6 +11,10 @@ import {
   PAYMENT_STATUS_STYLES,
 } from "@/lib/payments";
 import type { AttemptListItem, AttemptListQuery } from "@/types/attempt";
+import CandidatePaymentsLoading from "./loading";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeader } from "@/components/shared/page-header";
+import { ErrorState } from "@/components/shared/error-state";
 
 export default function CandidatePaymentsPage() {
   const router = useRouter();
@@ -24,33 +25,18 @@ export default function CandidatePaymentsPage() {
     limit: Number(searchParams.get("limit")) || 10,
   };
 
-  const { data, isLoading, isError } = useMyAttempts(query);
+  const { data, isLoading, isError, refetch } = useMyAttempts(query);
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-7 w-56" />
-          <Skeleton className="h-4 w-72" />
-        </div>
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-16 w-full" />
-          ))}
-        </div>
-      </div>
-    );
+    return <CandidatePaymentsLoading />;
   }
 
   if (isError || !data?.success) {
     return (
-      <Card className="border-destructive/50 bg-destructive/5">
-        <CardContent className="pt-6">
-          <p className="text-sm text-destructive">
-            Failed to load payment history. Please try again later.
-          </p>
-        </CardContent>
-      </Card>
+      <ErrorState
+        message="Failed to load payment history. Please try again later."
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -65,12 +51,10 @@ export default function CandidatePaymentsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Payment History</h1>
-        <p className="text-sm text-muted-foreground">
-          Review all transactions tied to your assessment enrollments.
-        </p>
-      </div>
+      <PageHeader
+        title="Payment History"
+        description="Review all transactions tied to your assessment enrollments."
+      />
 
       <Card>
         <CardHeader>
@@ -79,23 +63,20 @@ export default function CandidatePaymentsPage() {
 
         <CardContent>
           {attempts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Receipt
-                className="mb-4 h-12 w-12 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <h3 className="text-lg font-semibold">No payments yet</h3>
-              <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                Enroll in a paid assessment to see your transaction history
-                here. Free assessments do not generate a payment record.
-              </p>
-              <Link href="/candidate/assessments" className="mt-5">
-                <Button variant="outline">
-                  <CreditCard className="mr-1 h-4 w-4" aria-hidden="true" />
-                  Browse Assessments
-                </Button>
-              </Link>
-            </div>
+            <EmptyState
+              icon={Receipt}
+              title="No payments yet"
+              description="Enroll in a paid assessment to see your transaction history 
+                here. Free assessments do not generate a payment record."
+              action={
+                <Link href="/candidate/assessments" className="mt-5">
+                  <Button variant="outline">
+                    <CreditCard className="mr-1 h-4 w-4" aria-hidden="true" />
+                    Browse Assessments
+                  </Button>
+                </Link>
+              }
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

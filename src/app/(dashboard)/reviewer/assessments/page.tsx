@@ -1,19 +1,21 @@
 "use client";
-
 import { BookOpen, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import { AssessmentFilterForm } from "@/components/reviewer/assessment-filter-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ErrorState } from "@/components/shared/error-state";
+import { PageHeader } from "@/components/shared/page-header";
 import {
   useDeleteAssessment,
   useManagedAssessments,
   usePublishAssessment,
 } from "@/hooks/useAssessments";
 import type { AssessmentListQuery, AssessmentStatus } from "@/types/assessment";
+import ReviewerAssessmentsLoading from "./loading";
+import { useConfirm } from "@/components/shared/confirm-dialog-provider";
 
 const STATUS_STYLES: Record<AssessmentStatus, string> = {
   DRAFT:
@@ -26,6 +28,7 @@ const STATUS_STYLES: Record<AssessmentStatus, string> = {
 export default function ReviewerAssessmentsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const confirm = useConfirm();
 
   const statusParam = searchParams.get("status");
   const statusFilter: AssessmentStatus | undefined =
@@ -42,7 +45,7 @@ export default function ReviewerAssessmentsPage() {
     status: statusFilter,
   };
 
-  const { data, isLoading, isError } = useManagedAssessments(query);
+  const { data, isLoading, isError, refetch } = useManagedAssessments(query);
   const publishMutation = usePublishAssessment();
   const deleteMutation = useDeleteAssessment();
 
@@ -50,41 +53,27 @@ export default function ReviewerAssessmentsPage() {
     publishMutation.mutate(id);
   };
 
-  const handleDelete = (id: string) => {
-    if (typeof window === "undefined") return;
-    if (!window.confirm("Soft delete this assessment? It will be archived.")) {
-      return;
-    }
+  const handleDelete = async (id: string) => {
+    const ok = await confirm({
+      title: "Soft delete this assessment?",
+      description: "It will be archived and cannot be edited afterwards.",
+      confirmLabel: "Delete",
+      variant: "destructive",
+    });
+    if (!ok) return;
     deleteMutation.mutate(id);
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-9 w-64" />
-          <Skeleton className="h-10 w-40" />
-        </div>
-        <div className="h-24 w-full animate-pulse bg-muted" />
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-20 w-full animate-pulse bg-muted" />
-          ))}
-        </div>
-      </div>
-    );
+    return <ReviewerAssessmentsLoading />;
   }
 
   if (isError || !data?.success) {
-    toast.error("Failed to load your assessments");
     return (
-      <Card className="border-destructive/50 bg-destructive/5">
-        <CardContent className="pt-6">
-          <p className="text-sm text-destructive">
-            Failed to load assessments. Please try again later.
-          </p>
-        </CardContent>
-      </Card>
+      <ErrorState
+        message="Failed to load assessments. Please try again later."
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -99,20 +88,18 @@ export default function ReviewerAssessmentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">My Assessments</h1>
-          <p className="text-sm text-muted-foreground">
-            Create, publish, and manage your developer assessments.
-          </p>
-        </div>
-        <Link href="/reviewer/assessments/create">
-          <Button>
-            <Plus className="size-4" aria-hidden="true" />
-            Create Assessment
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        title="My Assessments"
+        description="Create, publish, and manage your developer assessments."
+        action={
+          <Link href="/reviewer/assessments/create">
+            <Button>
+              <Plus className="size-4" aria-hidden="true" />
+              Create Assessment
+            </Button>
+          </Link>
+        }
+      />
 
       <Card>
         <CardHeader>
@@ -121,23 +108,19 @@ export default function ReviewerAssessmentsPage() {
         </CardHeader>
         <CardContent>
           {assessments.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <BookOpen
-                className="mb-4 h-12 w-12 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <h3 className="text-lg font-semibold">No assessments found</h3>
-              <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                You have not created any assessments yet, or none match your
-                current filters.
-              </p>
-              <Link href="/reviewer/assessments/create" className="mt-5">
-                <Button variant="outline">
-                  <Plus className="size-4" aria-hidden="true" />
-                  Create your first assessment
-                </Button>
-              </Link>
-            </div>
+            <EmptyState
+              icon={BookOpen}
+              title="No assessments found"
+              description="You have not created any assessments yet, or none match your current filters."
+              action={
+                <Link href="/reviewer/assessments/create">
+                  <Button variant="outline">
+                    <Plus className="size-4" aria-hidden="true" />
+                    Create your first assessment
+                  </Button>
+                </Link>
+              }
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

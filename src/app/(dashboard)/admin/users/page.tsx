@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, User2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { UserFilterForm } from "@/components/admin/user-filter-form";
@@ -26,6 +26,11 @@ import {
 import { useAuthStore } from "@/store/auth.store";
 import type { User, UserStatus } from "@/types/user";
 import type { UserFilterValues } from "@/validation/users";
+import { ErrorState } from "@/components/shared/error-state";
+import AdminUsersLoading from "./loading";
+import { PageHeader } from "@/components/shared/page-header";
+import { EmptyState } from "@/components/shared/empty-state";
+import { useConfirm } from "@/components/shared/confirm-dialog-provider";
 
 export default function AdminUsersPage() {
   const router = useRouter();
@@ -42,30 +47,18 @@ export default function AdminUsersPage() {
     sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
   };
 
-  const { data, isLoading, isError } = useUsers(query);
+  const { data, isLoading, isError, refetch } = useUsers(query);
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="h-10 w-full max-w-3xl animate-pulse bg-muted" />
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 w-full animate-pulse bg-muted" />
-          ))}
-        </div>
-      </div>
-    );
+    return <AdminUsersLoading />;
   }
 
   if (isError || !data?.success) {
     return (
-      <Card className="border-destructive/50 bg-destructive/5">
-        <CardContent className="pt-6">
-          <p className="text-sm text-destructive">
-            Failed to load users. Please try again later.
-          </p>
-        </CardContent>
-      </Card>
+      <ErrorState
+        message="Failed to load users. Please try again later."
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -74,14 +67,10 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Manage Users</h1>
-          <p className="text-sm text-muted-foreground">
-            View, filter, block, and change roles for platform users.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Manage Users"
+        description="View, filter, block, and change roles for platform users."
+      />
 
       <Card>
         <CardHeader>
@@ -90,11 +79,11 @@ export default function AdminUsersPage() {
         </CardHeader>
         <CardContent>
           {users.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-sm font-medium text-muted-foreground">
-                No users found matching your criteria.
-              </p>
-            </div>
+            <EmptyState
+              icon={User2}
+              title="No users found matching your criteria."
+              description="Reset filter or try editing the filters!"
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -161,6 +150,7 @@ export default function AdminUsersPage() {
 function UserRow({ user }: { user: User }) {
   const currentUser = useAuthStore((s) => s.user);
   const isSelf = currentUser?.id === user.id;
+  const confirm = useConfirm();
 
   const statusMutation = useUpdateUserStatus();
   const roleMutation = useUpdateUserRole();
@@ -184,12 +174,15 @@ function UserRow({ user }: { user: User }) {
     roleMutation.mutate({ userId: user.id, role });
   };
 
-  const handleDelete = () => {
-    if (isSelf || typeof window === "undefined") return;
-    const confirmed = window.confirm(
-      `Soft delete ${user.name}? Their account will be blocked and sessions revoked.`,
-    );
-    if (!confirmed) return;
+  const handleDelete = async () => {
+    if (isSelf) return;
+    const ok = await confirm({
+      title: `Soft delete ${user.name}?`,
+      description: "Their account will be blocked and sessions revoked.",
+      confirmLabel: "Delete user",
+      variant: "destructive",
+    });
+    if (!ok) return;
     deleteMutation.mutate(user.id);
   };
 

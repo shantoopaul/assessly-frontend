@@ -1,13 +1,13 @@
 "use client";
-
 import { ClipboardCheck, Clock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useClaimAttempt, useReviewQueue } from "@/hooks/useReviews";
 import type { ReviewListQuery } from "@/types/review";
+import ReviewerQueueLoading from "./loading";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeader } from "@/components/shared/page-header";
 
 export default function ReviewerQueuePage() {
   const router = useRouter();
@@ -28,19 +28,7 @@ export default function ReviewerQueuePage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-7 w-56" />
-          <Skeleton className="h-4 w-72" />
-        </div>
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-16 w-full" />
-          ))}
-        </div>
-      </div>
-    );
+    return <ReviewerQueueLoading />;
   }
 
   if (isError || !data?.success) {
@@ -60,12 +48,10 @@ export default function ReviewerQueuePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Review Queue</h1>
-        <p className="text-sm text-muted-foreground">
-          Claim a submitted attempt to start grading its free-form answers.
-        </p>
-      </div>
+      <PageHeader
+        title="Review Queue"
+        description="Claim a submitted attempt to start grading its free-form answers."
+      />
 
       <Card>
         <CardHeader>
@@ -74,16 +60,11 @@ export default function ReviewerQueuePage() {
 
         <CardContent>
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <ClipboardCheck
-                className="mb-4 h-12 w-12 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <h3 className="text-lg font-semibold">Queue is empty</h3>
-              <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                There are no submitted attempts waiting for review right now.
-              </p>
-            </div>
+            <EmptyState
+              icon={ClipboardCheck}
+              title="Queue is empty"
+              description="There are no submitted attempts waiting for review right now."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

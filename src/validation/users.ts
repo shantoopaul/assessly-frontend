@@ -11,3 +11,12 @@ export const userFilterSchema = z.object({
 });
 
 export type UserFilterValues = z.infer<typeof userFilterSchema>;
+
+export const userFilterFormSchema = z.object({
+  search: z.string().optional(),
+  role: z.enum([ROLES.CANDIDATE, ROLES.REVIEWER, ROLES.ADMIN]).optional(),
+  status: z.enum(["ACTIVE", "BLOCKED"] as const).optional(),
+  page: z.number().int().min(1),
+  limit: z.number().int().min(1).max(100),
+  sortOrder: z.enum(["asc", "desc"]),
+});

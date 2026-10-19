@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuditLogs } from "@/hooks/useAuditLogs";
 import type { AuditLogListQuery } from "@/types/audit";
+import AdminAuditLogsLoading from "./loading";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ErrorState } from "@/components/shared/error-state";
+import { PageHeader } from "@/components/shared/page-header";
 
 const ACTION_STYLES: Record<string, string> = {
   AUTH_REGISTER:
@@ -81,7 +85,7 @@ export default function AdminAuditLogsPage() {
     entityType: searchParams.get("entityType") || undefined,
   };
 
-  const { data, isLoading, isError } = useAuditLogs(query);
+  const { data, isLoading, isError, refetch } = useAuditLogs(query);
 
   const goToPage = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -90,31 +94,15 @@ export default function AdminAuditLogsPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <div className="h-7 w-56 animate-pulse bg-muted" />
-          <div className="h-4 w-96 max-w-full animate-pulse bg-muted" />
-        </div>
-        <div className="h-24 w-full animate-pulse bg-muted" />
-        <div className="space-y-3">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-16 w-full animate-pulse bg-muted" />
-          ))}
-        </div>
-      </div>
-    );
+    return <AdminAuditLogsLoading />;
   }
 
   if (isError || !data?.success) {
     return (
-      <Card className="border-destructive/50 bg-destructive/5">
-        <CardContent className="pt-6">
-          <p className="text-sm text-destructive">
-            Failed to load audit logs. Please try again later.
-          </p>
-        </CardContent>
-      </Card>
+      <ErrorState
+        message="Failed to load audit logs. Please try again later."
+        onRetry={() => refetch()}
+      />
     );
   }
 
@@ -123,12 +111,10 @@ export default function AdminAuditLogsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Audit Logs</h1>
-        <p className="text-sm text-muted-foreground">
-          Every critical action recorded across the platform.
-        </p>
-      </div>
+      <PageHeader
+        title="Audit Logs"
+        description="Every critical action recorded across the platform."
+      />
 
       <Card>
         <CardHeader>
@@ -138,17 +124,12 @@ export default function AdminAuditLogsPage() {
 
         <CardContent>
           {logs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <ScrollText
-                className="mb-4 h-12 w-12 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <h3 className="text-lg font-semibold">No audit logs found</h3>
-              <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                No entries match your current filters. Try clearing the action
-                or entity filter.
-              </p>
-            </div>
+            <EmptyState
+              icon={ScrollText}
+              title="No audit logs found"
+              description="No entries match your current filters. Try clearing the action 
+              or entity filter."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

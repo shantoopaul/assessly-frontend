@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { reviewsApi } from "@/api/reviews";
 import type { EvaluateInput, ReviewListQuery } from "@/types/review";
+import { toastApiError } from "@/lib/toast";
 
 export const REVIEWS_QUERY_KEY = ["reviews"] as const;
 
@@ -47,9 +48,7 @@ export function useClaimAttempt() {
         queryKey: [...REVIEWS_QUERY_KEY, "attempt", attemptId],
       });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to claim attempt");
-    },
+    onError: (error) => toastApiError(error, "Failed to claim attempt"),
   });
 }
 
@@ -71,8 +70,6 @@ export function useEvaluateAttempt() {
         queryKey: [...REVIEWS_QUERY_KEY, "attempt", variables.attemptId],
       });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to evaluate attempt");
-    },
+    onError: (error) => toastApiError(error, "Failed to evaluate attempt"),
   });
 }

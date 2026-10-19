@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { attemptsApi } from "@/api/attempts";
 import { useAuthStore } from "@/store/auth.store";
 import type { AttemptListQuery } from "@/types/attempt";
+import { toastApiError } from "@/lib/toast";
 
 export const ATTEMPTS_QUERY_KEY = ["attempts"] as const;
 
@@ -43,9 +44,7 @@ export function useEnrollAssessment() {
         router.push(`/candidate/attempts/${res.data.id}`);
       }
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to enroll in assessment");
-    },
+    onError: (error) => toastApiError(error, "Failed to enroll in assessment"),
   });
 }
 
@@ -61,9 +60,7 @@ export function useStartAttempt() {
       });
       queryClient.invalidateQueries({ queryKey: ATTEMPTS_QUERY_KEY });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to start attempt");
-    },
+    onError: (error) => toastApiError(error, "Failed to start attempt"),
   });
 }
 
@@ -85,9 +82,7 @@ export function useSaveAnswer() {
         queryKey: [...ATTEMPTS_QUERY_KEY, "detail", variables.attemptId],
       });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to save answer");
-    },
+    onError: (error) => toastApiError(error, "Failed to save answer"),
   });
 }
 
@@ -105,8 +100,6 @@ export function useSubmitAttempt() {
       });
       router.push("/candidate/attempts");
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to submit attempt");
-    },
+    onError: (error) => toastApiError(error, "Failed to submit attempt"),
   });
 }
